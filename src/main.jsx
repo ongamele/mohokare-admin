@@ -9,8 +9,8 @@ import "../public/css/tailwind.css";
 import App from "./App";
 
 const client = new ApolloClient({
-  uri: "http://localhost:5000/graphql",
-  // uri: 'https://mdt-bk.herokuapp.com/graphql',
+ // uri: "http://localhost:5000/graphql",
+   uri: 'https://mohokare-api-03a5c49b096f.herokuapp.com/graphql',
   cache: new InMemoryCache(),
 });
 

@@ -5,19 +5,31 @@ import { gql } from "@apollo/client";
 export const GET_STATEMENT= gql`
   query getStatement($accountNumber: String!) {
     getStatement(accountNumber: $accountNumber) {
-      id
       accountNumber
       consumerName
+      phoneNumber
+      email
       province
       town
+      suburb
       ward
+      street
       postalAddress1
       postalAddress2
       postalAddress3
       postalCode
       vatNumber
       deposit
+      marketValue
+      erfNumber
       taxNumber
+      days120
+      days90
+      days60
+      days30
+      current
+      closingBalance
+      openingBalance
       createdAt
     }
   }
@@ -148,16 +160,29 @@ query getAllStatements{
   getAllStatements {
     accountNumber
     consumerName
+    phoneNumber
+    email
     province
     town
+    suburb
     ward
+    street
     postalAddress1
     postalAddress2
     postalAddress3
     postalCode
     vatNumber
     deposit
+    marketValue
+    erfNumber
     taxNumber
+    days120
+    days90
+    days60
+    days30
+    current
+    closingBalance
+    openingBalance
     createdAt
   }
 }

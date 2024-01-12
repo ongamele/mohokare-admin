@@ -6,7 +6,11 @@ import {
   Typography,
   Chip,
   Input,
-  Button
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { authorsTableData, projectsTableData } from "@/data";
@@ -23,11 +27,31 @@ import { GET_REFUSE } from "../../Graphql/Queries";
 import { GET_SEWERAGE } from "../../Graphql/Queries";
 import { GET_VAT } from "../../Graphql/Queries";
 import { GET_WATER_TARIFF_DOMESTIC } from "../../Graphql/Queries";
-import { GET_WATER_TARIFF_DOMESTIC_BASIC } from "../../Graphql/Queries";
 
 export function Tables() {
+  const [open, setOpen] = React.useState(false);
+ 
+  const handleOpen = () => setOpen(!open);
+
+
   const [accountNumber, setAccountNumber ] = useState('');
+  const [meterObj, setMeterObj] = useState({})
+  const [detailsObj, setDetailsObj] = useState({})
+  const [cashPaymentObj, setCashPaymentObj] = useState({})
+  const [interestObj, setInterestObj] = useState({})
+  const [refuseObj, setrefuseObj] = useState({})
+  const [sewerageObj, setSewerageObj] = useState({})
+  const [vatObj, setVatObj] = useState({})
+  const [waterTariffDomesticObj, setWaterTariffDomesticObj] = useState({})
+  
+  
   const { data: allStatements } = useQuery(GET_ALL_STATEMENTS);
+
+  
+  
+
+
+
 
 
   const {
@@ -38,7 +62,7 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed meterData query
-      console.log('Meter data loaded:', data);
+      setMeterObj(data.getMeterReadings)
       if (statementData) {
         //generatePDF(meterData, statementData);
       }
@@ -53,7 +77,7 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('Statement data loaded:', data);
+      setDetailsObj(data.getStatement)
       if (meterData) {
         //generatePDF(meterData, statementData);
       }
@@ -68,7 +92,8 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('Cash Balance data loaded:', data);
+      setCashPaymentObj(data.getCashPayment)
+      
       if (meterData) {
         //generatePDF(meterData, statementData);
       }
@@ -84,7 +109,9 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('Interest data loaded:', data);
+      //console.log('Interest data loaded:', data);
+      setInterestObj(data.getInterest);
+      
       if (meterData) {
         //generatePDF(meterData, statementData,);
       }
@@ -101,7 +128,8 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('Refuse data loaded:', data);
+      setrefuseObj(data.getRefuse);
+      
       if (meterData) {
         //generatePDF(meterData, statementData,);
       }
@@ -117,7 +145,8 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('Sewerage data loaded:', data);
+    
+      setSewerageObj(data.getSewage)
       if (meterData) {
         //generatePDF(meterData, statementData,);
       }
@@ -133,7 +162,8 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('Vat data loaded:', data);
+      
+      setVatObj(data.getVat)
       if (meterData) {
         //generatePDF(meterData, statementData,);
       }
@@ -149,7 +179,8 @@ export function Tables() {
     variables: { accountNumber },
     onCompleted: (data) => {
       // Handle completed statementData query
-      console.log('VWater Tariff Domestic Data loaded:', data);
+      
+      setWaterTariffDomesticObj(data.getWaterTariffDomestic);
       if (meterData) {
         //generatePDF(meterData, statementData,);
       }
@@ -157,25 +188,109 @@ export function Tables() {
   });
 
 
-  const {
-    loading: waterTariffDomesticBasicDataLoading,
-    data: waterTariffDomesticBasicData,
-    refetch: refetchSWaterTariffDomesticBasicData,
-  } = useQuery(GET_WATER_TARIFF_DOMESTIC_BASIC, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      console.log('Water Tariff Domestic Basic Data loaded:', data);
-      if (meterData) {
-        //generatePDF(meterData, statementData,);
-      }
-    },
-  });
 
-  const generatePDF = async (meterData, statementData) => {
+   const manageDownload = async () => {
+    handleOpen()
+    var selectedStatement = {}
+   // console.log(JSON.stringify(selectedStatement))
+    selectedStatement.meterReadings = meterObj;
+    selectedStatement.details = detailsObj
+    selectedStatement.cashPayment = cashPaymentObj
+    selectedStatement.interest = interestObj
+    selectedStatement.refuse = refuseObj
+    selectedStatement.sewerage = sewerageObj
+    selectedStatement.vat = vatObj
+    selectedStatement.waterTariffDomestic = waterTariffDomesticObj
+   
+    await generatePDF(selectedStatement)
+   }
+
+  const generatePDF = async (selectedStatement) => {
 
   
-    console.log(JSON.stringify(statementData));
+    const postalAddress1 = selectedStatement?.details?.postalAddress1 || '';
+    const postalAddress2 = selectedStatement?.details?.postalAddress2 || '';
+    const postalCode = selectedStatement?.details?.postalCode || '';
+    const consumerName = selectedStatement?.details?.consumerName || '';
+    const accountNumber = selectedStatement?.details?.accountNumber || '';
+    const vatNumber = selectedStatement?.details?.vatNumber || '';
+    const taxNumber = selectedStatement?.details?.taxNumber || '';
+    const balance = selectedStatement?.details?.balance || '';
+    const date = selectedStatement?.details?.date || '';
+
+    const phoneNumber = selectedStatement?.details?.date || '';
+    const email = selectedStatement?.details?.email || '';
+    const province = selectedStatement?.details?.province || '';
+    const town = selectedStatement?.details?.town || '';
+    const suburb = selectedStatement?.details?.suburb || '';
+    const ward = selectedStatement?.details?.ward || '';
+    const street = selectedStatement?.details?.street || '';
+    const marketValue = selectedStatement?.details?.marketValue || '';
+    const erfNumber = selectedStatement?.details?.erfNumber || '';
+    const days120 = selectedStatement?.details?.days120 || '';
+    const days90 = selectedStatement?.details?.days90 || '';
+    const days60 = selectedStatement?.details?.days60 || '';
+    const days30 = selectedStatement?.details?.days30 || '';
+    const deposit = selectedStatement?.details?.deposit || '';
+    const current = selectedStatement?.details?.current || '';
+    const closingBalance = selectedStatement?.details?.closingBalance || '';
+    const openingBalance = parseInt(current) - parseInt(closingBalance);
+
+
+    const meterNumber = selectedStatement?.meterReadings?.meterNumber || '';
+    const meterType =selectedStatement?.meterReadings?.type || '';
+    const oldRead = selectedStatement?.meterReadings?.oldRead || '';
+    const newRead = selectedStatement?.meterReadings?.newRead || '';
+    const consumption = selectedStatement?.meterReadings?.consuption || '';
+    
+
+    const cashPaymentDate = selectedStatement?.cashPayment?.date || '';
+    const cashPaymentCode = '';
+    const cashPaymentDescription = selectedStatement?.cashPayment?.description || '';
+    const cashPaymentUnits = selectedStatement?.cashPayment?.units || '';
+    const cashPaymentTariff = '000000';
+    const cashPaymentValue = selectedStatement?.cashPayment?.value || '';
+
+    const interestDate = selectedStatement?.interest?.date || '';
+    const interestCode = '009009';
+    const interestDescription = selectedStatement?.interest?.description || '';
+    const interestUnits = selectedStatement?.interest?.units || '';
+    const interestTariff = '';
+    const interestValue = selectedStatement?.interest?.value || '';
+
+    const refuseDate = selectedStatement?.refuse?.date || '';
+    const refuseCode = '050010';
+    const refuseDescription = selectedStatement?.refuse?.description || '';
+    const refuseUnits = selectedStatement?.refuse?.units || '';
+    const refuseTariff = '72.430000';
+    const refuseValue = selectedStatement?.refuse?.value || '';
+
+    const sewerageDate = selectedStatement?.sewerage?.date || '';
+    const sewerageCode = '050010';
+    const sewerageDescription = selectedStatement?.sewerage?.description || '';
+    const sewerageUnits = selectedStatement?.sewerage?.units || '';
+    const sewerageTariff = '126.870000';
+    const sewerageValue = selectedStatement?.sewerage?.value || '';
+
+
+    const vatDate = selectedStatement?.vat?.date || '';
+    const vatCode = '008888';
+    const vatDescription = selectedStatement?.vat?.description || '';
+    const vatUnits = selectedStatement?.vat?.units || '';
+    const vatTariff = '';
+    const vatValue = selectedStatement?.vat?.value || '';
+
+    const waterTariffDomesticeDate = selectedStatement?.waterTariffDomestic?.date || '';
+    const waterTariffDomesticCode = '041001';
+    const waterTariffDomesticDescription = selectedStatement?.waterTariffDomestic?.description || '';
+    const waterTariffDomesticUnits = selectedStatement?.waterTariffDomestic?.units || '';
+    const waterTariffDomesticTariff = '12.000000';
+    const waterTariffDomesticValue = selectedStatement?.waterTariffDomestic?.value || '';
+
+   
+
+
+
 
     let left = 20;
     let top = 6;
@@ -196,10 +311,10 @@ export function Tables() {
     doc.setFont(undefined, 'normal');
     doc.setFontSize(8);
     doc.text('MOHOKARE LOCAL MUNICIPALITY', 140, 16);
-    doc.text('1 Hoofd Street, Zastron 9950', 140, 22);
+    doc.text(`${postalAddress1}, ${postalAddress2} ${postalCode}`, 140, 22);
     doc.text('Tel:(051) 673 9600', 140, 28);
     doc.text('Fax: (051) 673 1550', 140, 34);
-    doc.text('Vat No.:4000846412', 140, 40);
+    doc.text(`Vat No.: ${vatNumber}`, 140, 40);
   
     doc.line(5, 43, 205, 43);
   
@@ -211,7 +326,7 @@ export function Tables() {
     doc.setFontSize(8);
   
     const column1 = ['Account Number:', 'Consumer Name:', 'Postal Address:', 'Postal Code:', 'Internet Pin:', 'Account Date:', 'Tax Invoice No.:', 'Vat Registration No.:'];
-    const column2 = ['0120102001', 'LANGUZA SN', '27 ZASTRON', '', '972674080', '30 APR 2023', '0100450001202304', ''];
+    const column2 = [accountNumber, consumerName, postalAddress2, postalCode, '', , date, taxNumber, vatNumber];
   
     const x1 = 20;
     const x2 = 70;
@@ -228,19 +343,19 @@ export function Tables() {
     });
   
     doc.text('ERF Description:', 110, 60);
-    doc.text('10000 000000308', 160, 60);
+    doc.text(erfNumber, 160, 60);
   
     doc.text('Market Value:', 110, 66);
     doc.text('352,500.00', 160, 66);
   
     doc.text('Street:', 110, 72);
-    doc.text('27 VOORTREKKER', 160, 72);
+    doc.text(street, 160, 72);
   
     doc.text('Land Area:', 110, 78);
     doc.text('2141.0000', 160, 78);
   
     doc.text('Deposit:', 110, 84);
-    doc.text('95.00', 160, 84);
+    doc.text(deposit, 160, 84);
   
     doc.line(5, 110, 205, 110);
   
@@ -250,7 +365,7 @@ export function Tables() {
     doc.text('METER READINGS', 80, 116);
   
     const headers = ['Meter No', 'Meter Type', 'Old Reading', 'New Reading', 'Consumption'];
-    const data = [['123', 'Water', '1000', '1100', '100']];
+    const data = [[meterNumber, meterType, oldRead, newRead, consumption]];
   
     doc.autoTable({
       head: [headers],
@@ -272,7 +387,7 @@ export function Tables() {
     doc.text('ACCOUNT DETAILS', 80, 140);
   
     const headers2 = ['Date', 'Code', 'Description', 'Units', 'Tariff', 'Value'];
-    const data3 = [['11/09/2023', '008888', 'Opening Balance', '1204', '000000', '2,120'], ['11/09/2023', '001953', 'Cash Payment', '0000', '000000', '0'], ['11/09/2023', '008400', 'Refuse Res', '600', '66.1000', '66'], ['11/09/2023', '054260', 'Cash Payment', '0000', '000000', '0'], ['10/06/2023', '004662', 'Sewage Res', '600', '104.32000', '104.3'], ['11/09/2023', '', 'Cash Payment', '0000', '000000', '0'], ['11/09/2023', '078423', 'Water Tarif 1', '2.200', '9.00000', '40.42'], ['11/09/2023', '', 'Cash Payment', '0000', '000000', '0'], ['11/09/2023', '', 'Water Rariff 1', '0', '0', '0'], ['11/09/2023', '004838', 'Cash Payment', '0000', '000000', '0'], ['', '005306', 'Vat', '', '', '12.30'], ['', '005306', 'Interest', '', '', '1.35']];
+    const data3 = [[date, '', 'Opening Balance', '', '', openingBalance][date, cashPaymentCode, cashPaymentDescription, cashPaymentUnits, cashPaymentTariff, cashPaymentValue], [date, refuseCode, refuseDescription, refuseUnits, refuseTariff, refuseValue], [date, sewerageCode, sewerageDescription, sewerageUnits, sewerageTariff, sewerageValue], [date, waterTariffDomesticCode, waterTariffDomesticDescription, waterTariffDomesticUnits, waterTariffDomesticTariff, waterTariffDomesticValue], [date, vatCode, vatDescription, vatUnits, vatTariff, vatValue], [date, interestCode, interestDescription, interestUnits, interestTariff, interestValue]];
   
     doc.autoTable({
       head: [headers2],
@@ -289,7 +404,7 @@ export function Tables() {
 
 
     const daysHeaders = ['120+ Days', '90 Days', '60 Days', '30 Days', 'Current', 'Closing Balance'];
-    const daysData = [['0.00', '0.00', '0.00', '2.140', '234.0' , '214.4']];
+    const daysData = [[days120, days90, days60, days30, current, closingBalance]];
   
     doc.autoTable({
       head: [daysHeaders],
@@ -310,8 +425,8 @@ export function Tables() {
     doc.setTextColor(0, 0, 0);
   
     var remittanceText = "REMITTANCE\n" +
-                     "ACCOUNT NUMBER: 0120102001\n" +
-                     "CONSUMER NAME: LANGUZA SN\n" +
+                     "ACCOUNT NUMBER: " +{accountNumber}+"\n" +
+                     "CONSUMER NAME: " +{consumerName}+"\n" +
                      "TOTAL DUE: 2,620.60\n" +
                      "TOTAL DUE ON OR BEFORE: 02/06/2023";
 
@@ -334,17 +449,55 @@ doc.text(140, doc.internal.pageSize.height - 20, bankingDetailsText);
   
 
 
+ 
+
 
   return (
+    <>
+  
+      <Dialog open={open} handler={handleOpen}>
+        <DialogHeader>
+          <Typography variant="h5" color="blue-gray">
+            Report Download
+          </Typography>
+        </DialogHeader>
+        <DialogBody divider className="grid place-items-center gap-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="blue"
+            className="h-16 w-16 text-red-500"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <Typography color="black" variant="h4">
+            Download PDF?
+          </Typography>
+        </DialogBody>
+        <DialogFooter className="space-x-2">
+          <Button variant="text" color="blue-gray" onClick={handleOpen}>
+            close
+          </Button>
+          <Button variant="gradient" onClick={() => manageDownload()}>
+            Ok
+          </Button>
+        </DialogFooter>
+      </Dialog>
+   
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card>
         <CardHeader variant="gradient" color="" style={{backgroundColor: "#3855E5"}} className="mb-8 p-6">
           <Typography variant="h6" color="white">
             Users
           </Typography>
+          
         </CardHeader>
         <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-         <h1>{accountNumber}</h1>
+        
           <table className="w-full min-w-[640px] table-auto">
             <thead>
               <tr>
@@ -418,7 +571,6 @@ doc.text(140, doc.internal.pageSize.height - 20, bankingDetailsText);
               )}
             </tbody>
           </table>
-          <Button onClick={generatePDF}>Download Statement</Button>
         </CardBody>
       </Card>
       <Typography variant="h40" style={{color: "#3855E5", fontSize: 12, marginBottom: -10}}>
@@ -491,7 +643,7 @@ doc.text(140, doc.internal.pageSize.height - 20, bankingDetailsText);
                     as="a"
                     href="#"
                     className="text-xs font-semibold text-blue-gray-600"
-                    onClick={() => setAccountNumber(statement.accountNumber)}
+                    onClick={() => {setAccountNumber(statement.accountNumber); handleOpen()}}
                   >
                     Download
                   </Typography>
@@ -506,6 +658,7 @@ doc.text(140, doc.internal.pageSize.height - 20, bankingDetailsText);
         </CardBody>
       </Card>
     </div>
+    </>
   );
 }
 
