@@ -32,15 +32,9 @@ export const navRoutes = [
       },*/
       {
         icon: <TableCellsIcon {...icon} />,
-        name: "Statements",
+        name: "Customers",
         path: "/tables",
         element: <Tables />,
-      },
-      {
-        icon: <UserGroupIcon {...icon} />,
-        name: "Customers",
-        path: "/customers",
-        element: <Customers />,
       },
       /*{
         icon: <InformationCircleIcon {...icon} />,

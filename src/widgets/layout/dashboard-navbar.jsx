@@ -59,17 +59,9 @@ export function DashboardNavbar() {
                 {layout}
               </Typography>
             </Link>
-            <Typography
-              variant="small"
-              color="blue-gray"
-              className="font-normal"
-            >
-              {page}
-            </Typography>
+     
           </Breadcrumbs>
-          <Typography variant="h6" color="blue-gray">
-            {page}
-          </Typography>
+
         </div>
         <div className="flex items-center">
         

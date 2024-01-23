@@ -41,3 +41,29 @@ export const CREATE_ADMIN = gql`
     }
   }
 `;
+
+
+export const CREATE_USER_NOTIFICATIONS = gql`
+  mutation createUserNotification($accountNumber: String!) {
+    createUserNotification(accountNumber: $accountNumber)
+  }
+`;
+
+export const CREATE_USER_SMS_NOTIFICATIONS = gql`
+  mutation createUserSmsNotification($accountNumber: String!) {
+    createUserSmsNotification(accountNumber: $accountNumber)
+  }
+`;
+
+export const CREATE_USER_EMAIL_NOTIFICATIONS = gql`
+  mutation createUserEmailNotification($accountNumber: String!) {
+    createUserEmailNotification(accountNumber: $accountNumber)
+  }
+`;
+
+
+export const UPDATE_USER_DETAILS = gql`
+  mutation updateUserDetails($firstName: String, $lastName: String, $email: String!) {
+    updateUserDetails(firstName: $firstName, lastName: $lastName, email: $email)
+  }
+`;

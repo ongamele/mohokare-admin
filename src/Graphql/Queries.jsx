@@ -10,6 +10,10 @@ export const GET_STATEMENT= gql`
       phoneNumber
       email
       province
+      idNumber
+      indigentExpiry
+      date
+      isIndigent
       town
       suburb
       ward
@@ -138,21 +142,7 @@ export const GET_WATER_TARIFF_DOMESTIC = gql`
 `;
 
 
-export const GET_WATER_TARIFF_DOMESTIC_BASIC = gql`
-  query getWaterTariffDomesticBasic($accountNumber: String!) {
-    getWaterTariffDomesticBasic(accountNumber: $accountNumber) {
-      id
-      accountNumber
-      date
-      code
-      description
-      units
-      tariff
-      value
-      createdAt
-    }
-  }
-`;
+
 
 
 export const GET_ALL_STATEMENTS = gql`
@@ -163,6 +153,10 @@ query getAllStatements{
     phoneNumber
     email
     province
+    idNumber
+    indigentExpiry
+    date
+    isIndigent
     town
     suburb
     ward
@@ -194,6 +188,7 @@ export const GET_METER_READINGS = gql`
     getMeterReadings(accountNumber: $accountNumber) {
       id
       accountNumber
+      meterNumber
       type
       oldRead
       newRead
@@ -202,4 +197,52 @@ export const GET_METER_READINGS = gql`
       createdAt
     }
   }
+`;
+
+
+export const GET_SUCCESSFUL_EMAILS_COUNT = gql`
+query getSuccessfulEmailsCount{
+  getSuccessfulEmailsCount
+}
+`;
+
+
+export const GET_FAILED_EMAILS_COUNT = gql`
+query getFailedEmailsCount{
+  getFailedEmailsCount
+}
+`;
+
+
+export const GET_SUCCESSFUL_SMS_COUNT = gql`
+query getSuccessfulSmsCount{
+  getSuccessfulSmsCount
+}
+`
+
+
+export const GET_FAILED_SMS_COUNT = gql`
+query getFailedSmsCount{
+  getFailedSmsCount
+}
+`
+
+export const GET_USER_NOTIFICATIONS = gql`
+  query getUserNotifications($accountNumber: String!) {
+    getUserNotifications(accountNumber: $accountNumber) {
+      emails {
+        id
+        accountNumber
+        status
+        createdAt
+      }
+      sms {
+        id
+        accountNumber
+        status
+        createdAt
+      }
+    }
+  }
+
 `;

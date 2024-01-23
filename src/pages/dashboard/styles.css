@@ -1,0 +1,5 @@
+.custom-divider {
+    height: 1px;
+    background-color: #ddd; /* You can customize the color */
+    margin: 10px 0; /* Adjust margin as needed */
+  }
