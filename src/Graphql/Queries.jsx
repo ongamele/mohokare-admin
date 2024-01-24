@@ -7,6 +7,8 @@ export const GET_STATEMENT= gql`
     getStatement(accountNumber: $accountNumber) {
       accountNumber
       consumerName
+      firstName
+    lastName
       phoneNumber
       email
       province
@@ -14,6 +16,7 @@ export const GET_STATEMENT= gql`
       indigentExpiry
       date
       isIndigent
+      indigentApplicationDate
       town
       suburb
       ward
@@ -150,6 +153,8 @@ query getAllStatements{
   getAllStatements {
     accountNumber
     consumerName
+    firstName
+    lastName
     phoneNumber
     email
     province
@@ -157,6 +162,7 @@ query getAllStatements{
     indigentExpiry
     date
     isIndigent
+    indigentApplicationDate
     town
     suburb
     ward

@@ -32,6 +32,7 @@ import { GET_WATER_TARIFF_DOMESTIC } from "../../Graphql/Queries";
 import { CREATE_USER_NOTIFICATIONS } from "../../Graphql/Mutations";
 import { CREATE_USER_EMAIL_NOTIFICATIONS } from "../../Graphql/Mutations";
 import { CREATE_USER_SMS_NOTIFICATIONS } from "../../Graphql/Mutations";
+import { UPDATE_USER_DETAILS } from "../../Graphql/Mutations";
 
 import { GET_USER_NOTIFICATIONS } from "../../Graphql/Queries";
 import './styles.css'
@@ -41,6 +42,13 @@ export function Tables() {
   const [openStat, setOpenStat] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [filterValue, setFilterValue] = useState('');
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
+
+
  
   const handleOpenStat = () => setOpenStat(!openStat);
   const handleOpen = () => setOpen(!open);
@@ -56,6 +64,7 @@ export function Tables() {
   const [sewerageObj, setSewerageObj] = useState({})
   const [vatObj, setVatObj] = useState({})
   const [waterTariffDomesticObj, setWaterTariffDomesticObj] = useState({})
+  const [accountNumberEdit, setAccountNumberEdit ] = useState('');
   
   
   const { data: allStatements } = useQuery(GET_ALL_STATEMENTS);
@@ -531,8 +540,7 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
       // Call refetchUserNotificationsData with the clicked accountNumber
       await refetchUserNotificationsData({ accountNumber });
   
-      // The refetch is complete here, so you can log the updated data
-      console.log(JSON.stringify(userNotifications));
+      
   
       // Now you can proceed with the rest of your logic
       handleOpenStat();
@@ -543,16 +551,29 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
   };
 
 
+  const [updateUserDetails, { loading: updateUserDetailsLoading }] = useMutation(UPDATE_USER_DETAILS, {
+    update(_, result) {
+      if (result.data.updateUserDetails) {
+        alert("UserDetails Updated Successfully!")
+      } else {
+        console.log("Error while updating user details!");
+      }
+    },
+    onError(err) {
+      console.log("Error! " + err);
+    },
+  });
+
+
 
 
   const handleEditClick = async (accountNumber) => {
     try {
-    /*  // Call refetchUserNotificationsData with the clicked accountNumber
-      await refetchUserNotificationsData({ accountNumber });
+      await refetchStatementData({ accountNumber });
   
       // The refetch is complete here, so you can log the updated data
-      console.log(JSON.stringify(userNotifications));
-  */
+   
+  
       // Now you can proceed with the rest of your logic
       handleOpenEdit();
     } catch (error) {
@@ -560,6 +581,31 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
       console.error("Error while refetching user data: ", error);
     }
   };
+
+  const handleEditSubmit = async () => {
+    if(firstName && lastName && phoneNumber && email && accountNumberEdit)
+    updateUserDetails({
+      variables: {
+        accountNumber: accountNumberEdit,
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+      },
+    })}
+
+
+
+
+  useEffect(() => {
+    if (statementData && statementData.getStatement) {
+      setAccountNumberEdit(statementData.getStatement.accountNumber);
+      setFirstName(statementData.getStatement.firstName);
+      setLastName(statementData.getStatement.lastName);
+      setPhoneNumber(statementData.getStatement.phoneNumber);
+      setEmail(statementData.getStatement.email);
+    }
+  }, [statementData]);
   return (
     <>
   
@@ -787,6 +833,8 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
             </Typography>
             <Input
               size="lg"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               placeholder="John"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -799,6 +847,8 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
             </Typography>
             <Input
               size="lg"
+              onChange={(e) => setLastName(e.target.value)}
+              value={lastName}
               placeholder="Mills"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -806,12 +856,14 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
               }}
             />
        
+       
             <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
               Your phone number
             </Typography>
             <Input
               size="lg"
-              value="0724586301"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="0724586301"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 
@@ -824,7 +876,8 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
             </Typography>
             <Input
               size="lg"
-              value="john@mail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="name@mail.com"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -860,7 +913,7 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
           </div>
 
           <Button variant="text"
-          onClick={() => handleOpenEdit(null)}
+          onClick={() => handleEditSubmit()}
           className="mr-1"
             color="white"  style={{marginTop: 12,backgroundColor: "#3855E5"}}>
             Save 
@@ -922,7 +975,7 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
           <table className="w-full min-w-[640px] table-auto">
             <thead>
                 <tr>
-                  {["Account Number", "Account Holder", "Indigent", "Indigent Expiry", "Date", "Province"].map(
+                  {["Account Number", "Account Holder", "Indigent", "Indigent Expiry", "Application Date",, "Province"].map(
                     (el) => (
                       <th
                         key={el}
@@ -965,7 +1018,7 @@ doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
                   </td>
                   <td className="py-3 px-5">
                     <Typography className="text-xs font-normal text-blue-gray-500">
-                    {statement.date && statement.date}
+                    {statement.date && statement.indigentApplicationDate}
                       </Typography>
                   
                   </td>

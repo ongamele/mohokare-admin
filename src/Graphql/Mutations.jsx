@@ -63,7 +63,7 @@ export const CREATE_USER_EMAIL_NOTIFICATIONS = gql`
 
 
 export const UPDATE_USER_DETAILS = gql`
-  mutation updateUserDetails($firstName: String, $lastName: String, $email: String!) {
-    updateUserDetails(firstName: $firstName, lastName: $lastName, email: $email)
+  mutation updateUserDetails($accountNumber: String, $firstName: String, $lastName: String,$phoneNumber: String!, $email: String!) {
+    updateUserDetails(accountNumber: $accountNumber, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, email: $email)
   }
 `;
