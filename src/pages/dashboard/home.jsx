@@ -1,7 +1,9 @@
 import React, {useState} from "react";
 import {
   Typography,
-
+  Card,
+  CardBody,
+  CardHeader,
   Chip,
   Input,
   Select,
@@ -10,7 +12,9 @@ import {
   PopoverHandler,
   PopoverContent,
 } from "@material-tailwind/react";
+
 import { useQuery } from "@apollo/react-hooks";
+
 
 import {
   ChatBubbleLeftIcon,
@@ -22,6 +26,10 @@ import {
 import { StatisticsCard } from "@/widgets/cards";
 
 import { DayPicker } from "react-day-picker";
+import Chart from "react-apexcharts";
+import { Square3Stack3DIcon} from "@heroicons/react/24/outline";
+
+
 
 import { GET_SUCCESSFUL_EMAILS_COUNT } from "../../Graphql/Queries";
 import { GET_SUCCESSFUL_SMS_COUNT } from "../../Graphql/Queries";
@@ -34,6 +42,47 @@ export function Home() {
   const { data: successfulSMSs } = useQuery(GET_SUCCESSFUL_SMS_COUNT);
   const { data: failedEmails } = useQuery(GET_FAILED_EMAILS_COUNT);
   const { data: failedSMSs } = useQuery(GET_FAILED_SMS_COUNT);
+
+
+  const emailsChartOptions = {
+    labels: ['Failed', 'Success'],
+    colors: ['#FF4560', '#00E08A'],
+    legend: {
+      show: true,
+      position: 'bottom',
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '65%',
+        },
+      },
+    },
+  };
+  
+
+  const emailsChartSeries = [Number(failedEmails?.getFailedEmailsCount), Number(successfulEmails?.getSuccessfulEmailsCount)];
+
+
+  const smsChartOptions = {
+    labels: ['Failed', 'Success'],
+    colors: ['#FF4560', '#00E08A'],
+    legend: {
+      show: true,
+      position: 'bottom',
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '65%',
+        },
+      },
+    },
+  };
+  
+
+  const smsChartSeries = [Number(failedSMSs?.getFailedSmsCount), Number(successfulSMSs?.getSuccessfulSmsCount)];
+
   return (
     <div className="mt-12">
     <div className="flex space-x-4">
@@ -130,6 +179,80 @@ export function Home() {
        </div>
    
      </div>
+
+
+
+     <br/>
+     <div className="flex flex-wrap gap-4">
+     <Card>
+        <CardHeader
+          floated={false}
+          shadow={false}
+          color="transparent"
+          className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+        >
+          <div className="w-max rounded-lg p-5 text-white" style={{backgroundColor: '#FF92B0'}}>
+            <ChatBubbleLeftIcon className="h-6 w-6" />
+          </div>
+          <div>
+            <Typography variant="h6" color="blue-gray">
+              SMSs
+            </Typography>
+            <Typography
+              variant="small"
+              color="gray"
+              className="max-w-sm font-normal"
+            >
+              Successful SMSs vs Unsuccessful SMSs
+             
+            </Typography>
+          </div>
+        </CardHeader>
+        <CardBody className="px-2 pb-0">
+        <Chart
+        options={smsChartOptions}
+        series={smsChartSeries}
+        type="donut"
+        width="380"
+      />
+    
+        </CardBody>
+      </Card>
+      <Card>
+        <CardHeader
+          floated={false}
+          shadow={false}
+          color="transparent"
+          className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+        >
+          <div className="w-max rounded-lg  p-5 text-white" style={{backgroundColor: '#F49C43'}}>
+            <EnvelopeIcon className="h-6 w-6" />
+          </div>
+          <div>
+            <Typography variant="h6" color="blue-gray">
+              Emails
+            </Typography>
+            <Typography
+              variant="small"
+              color="gray"
+              className="max-w-sm font-normal"
+            >
+             Successful emails vs unsuccessful emails
+             
+            </Typography>
+          </div>
+        </CardHeader>
+        <CardBody className="px-2 pb-0">
+        <Chart
+        options={emailsChartOptions}
+        series={emailsChartSeries}
+        type="donut"
+        width="380"
+      />
+    
+        </CardBody>
+      </Card>
+      </div>
     </div>
   );
 }

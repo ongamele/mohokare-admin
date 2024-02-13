@@ -2,7 +2,7 @@ import React, { useReducer, createContext } from 'react';
 import * as jwtDecode from 'jwt-decode';
 
 const initialState = {
-  admin: null,
+  user: null,
 };
 
 if (localStorage.getItem('jwtToken')) {
@@ -13,13 +13,13 @@ if (localStorage.getItem('jwtToken')) {
     localStorage.removeItem('jwtToken');
   } else {
     // Token is still valid, set the user in the initial state
-    initialState.admin = decodedToken;
+    initialState.user = decodedToken;
   }
 }
 
 const AuthContext = createContext({
-  admin: null,
-  loginAdmin: (userData) => {},
+  user: null,
+  login: (userData) => {},
   logout: () => {},
 });
 
@@ -28,12 +28,12 @@ function authReducer(state, action) {
     case 'LOGIN':
       return {
         ...state,
-        admin: action.payload,
+        user: action.payload,
       };
     case 'LOGOUT':
       return {
         ...state,
-        admin: null,
+        user: null,
       };
     default:
       return state;
@@ -43,7 +43,7 @@ function authReducer(state, action) {
 function AuthProvider(props) {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  function loginAdmin(userData) {
+  function login(userData) {
     localStorage.setItem('jwtToken', userData.token);
     dispatch({
       type: 'LOGIN',
@@ -57,7 +57,7 @@ function AuthProvider(props) {
   }
 
   return (
-    <AuthContext.Provider value={{ admin: state.admin, loginAdmin, logout }}>
+    <AuthContext.Provider value={{ user: state.user, login, logout }}>
       {props.children}
     </AuthContext.Provider>
   );

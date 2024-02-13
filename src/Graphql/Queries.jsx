@@ -252,3 +252,15 @@ export const GET_USER_NOTIFICATIONS = gql`
   }
 
 `;
+
+
+export const GET_ALL_PAYMENT_ARRANGEMENTS = gql`
+query getAllPaymentArrangements{
+    getAllPaymentArrangements {
+      accountNumber
+      paymentDate
+      amount
+      createdAt
+    }
+  }
+`;

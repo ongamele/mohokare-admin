@@ -24,11 +24,11 @@ export function SignIn() {
 
   const [loginAdmin, { loading }] = useMutation(LOGIN_ADMIN, {
     update(_, result) {
-      context.loginAdmin(result.data.loginAdmin);
+      context.login(result.data.loginAdmin);
       navigate("/dashboard/home");
     },
     onError(err) {
-      alert("User Not Found! " + err);
+      alert("User Not Found! ");
     },
 
     variables: {

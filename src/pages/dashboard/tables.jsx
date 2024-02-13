@@ -19,6 +19,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { PencilIcon, EyeIcon } from "@heroicons/react/24/outline";
 import imgSrc from "../../images/municipalityLogo.jpg";
+import yeboPayLogo from "../../images/yeboPay-logo.png";
 import { GET_ALL_STATEMENTS } from "../../Graphql/Queries";
 import { GET_METER_READINGS } from "../../Graphql/Queries";
 import { GET_STATEMENT } from "../../Graphql/Queries";
@@ -42,7 +43,7 @@ export function Tables() {
   const [openStat, setOpenStat] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [filterValue, setFilterValue] = useState('');
-
+ const [accountNumberEdit, setAccountNumberEdit ] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -64,7 +65,7 @@ export function Tables() {
   const [sewerageObj, setSewerageObj] = useState({})
   const [vatObj, setVatObj] = useState({})
   const [waterTariffDomesticObj, setWaterTariffDomesticObj] = useState({})
-  const [accountNumberEdit, setAccountNumberEdit ] = useState('');
+ 
   
   
   const { data: allStatements } = useQuery(GET_ALL_STATEMENTS);
@@ -89,6 +90,7 @@ export function Tables() {
     onCompleted: (data) => {
       // Handle completed meterData query
       setMeterObj(data.getMeterReadings)
+      
       if (statementData) {
         //generatePDF(meterData, statementData);
       }
@@ -279,6 +281,7 @@ export function Tables() {
     const oldRead = selectedStatement?.meterReadings?.oldRead || '';
     const newRead = selectedStatement?.meterReadings?.newRead || '';
     const consumption = selectedStatement?.meterReadings?.consumption || '';
+    const leviedAmount = selectedStatement?.meterReadings?.leviedAmount || '';
     
 
     const cashPaymentDate = selectedStatement?.cashPayment?.date || '';
@@ -336,7 +339,9 @@ export function Tables() {
   
     const doc = new jsPDF();
     var img = new Image();
+    var yeboImg = new Image();
     img.src = imgSrc;
+    yeboImg.src = yeboPayLogo;
     doc.addImage(img, "png", left, top, imgWidth, imgHeight);
 
         // Add a border around the entire PDF
@@ -383,7 +388,7 @@ export function Tables() {
     doc.text(erfNumber, 140, 60);
   
     doc.text('Market Value:', 110, 66);
-    doc.text(marketValue, 160, 66);
+    doc.text(marketValue, 140, 66);
   
     doc.text('Street:', 110, 72);
     doc.text(street, 140, 72);
@@ -401,8 +406,8 @@ export function Tables() {
     doc.setTextColor(0, 0, 0);
     doc.text('METER READINGS', 80, 116);
   
-    const headers = ['Meter No', 'Meter Type', 'Old Reading', 'New Reading', 'LEVIED AMOUNT'];
-    const data = [[meterNumber, meterType, oldRead, newRead, consumption]];
+    const headers = ['Meter No', 'Meter Type', 'Old Reading', 'New Reading', 'Consumption','LEVIED AMOUNT'];
+    const data = [[meterNumber, meterType, oldRead, newRead, consumption, leviedAmount]];
   
     doc.autoTable({
       head: [headers],
@@ -477,8 +482,16 @@ var bankingDetailsText = "BANK NAME: FNB\n" +
 
 doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
 
+let leftYeboPay = 85;
+doc.addImage(yeboImg, "png", leftYeboPay, doc.internal.pageSize.height - 24, 30, 10);
 
+var linkX = leftYeboPay;
+var linkY = doc.internal.pageSize.height - 24;
+var linkWidth = 30;
+var linkHeight = 10;
 
+// Add a transparent link over the image
+doc.link(linkX, linkY, linkWidth, linkHeight, { url: "https://neon-wisp-b1da94.netlify.app" });
   
     doc.save('statement.pdf'); 
   };

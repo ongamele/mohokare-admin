@@ -5,9 +5,10 @@ import {
   InformationCircleIcon,
   ServerStackIcon,
   RectangleStackIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  BellIcon
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Customers } from "@/pages/dashboard";
+import { Home, Profile, Tables, Customers, PaymentArrangements, PaymentReminders } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
 
 const icon = {
@@ -24,24 +25,25 @@ export const navRoutes = [
         path: "/home",
         element: <Home />,
       },
-      /*{
-        icon: <UserCircleIcon {...icon} />,
-        name: "Statements",
-        path: "/profile",
-        element: <Profile />,
-      },*/
       {
         icon: <TableCellsIcon {...icon} />,
         name: "Customers",
         path: "/tables",
         element: <Tables />,
       },
-      /*{
+      {
         icon: <InformationCircleIcon {...icon} />,
-        name: "notifications",
-        path: "/notifications",
-        element: <Notifications />,
-      },*/
+        name: "PaymentArrangements",
+        path: "/payment-arrangements",
+        element: <PaymentArrangements />,
+      },
+
+      {
+        icon: <BellIcon {...icon} />,
+        name: "PaymentReminders",
+        path: "/payment-reminders",
+        element: <PaymentReminders />,
+      },
     ],
   },
 ];
