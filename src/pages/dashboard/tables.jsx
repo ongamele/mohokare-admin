@@ -352,18 +352,18 @@ export function Tables() {
     doc.text('MOHOKARE LOCAL MUNICIPALITY', 140, 10);
     doc.setFont(undefined, 'normal');
     doc.setFontSize(8);
-    doc.text('MOHOKARE LOCAL MUNICIPALITY', 140, 16);
-    doc.text(`${postalAddress1}, ${postalAddress2} ${postalCode}`, 140, 22);
-    doc.text('Tel:(051) 673 9600', 140, 28);
-    doc.text('Fax: (051) 673 1550', 140, 34);
-    doc.text(`Vat No.: ${vatNumber}`, 140, 40);
+    doc.text('MOHOKARE LOCAL MUNICIPALITY', 140, 14);
+    doc.text('1 Hoofd Street, Zastron 9950', 140, 18);
+    doc.text('Tel:(051) 673 9600', 140, 22);
+    doc.text('Fax: (051) 673 1550', 140, 26);
+    doc.text(`Vat No.: ${vatNumber}`, 140, 30);
   
-    doc.line(5, 43, 205, 43);
+    doc.line(5, 34, 205, 34);
   
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
     doc.setFont(undefined, 'bold');
-    doc.text('TAX INVOICE/STATEMENT OF ACCOUNT', 70, 50);
+    doc.text('TAX INVOICE/STATEMENT OF ACCOUNT', 70, 40);
     doc.setFont(undefined, 'normal');
     doc.setFontSize(8);
   
@@ -372,39 +372,39 @@ export function Tables() {
   
     const x1 = 20;
     const x2 = 50;
-    const lineHeight = 6;
+    const lineHeight = 4;
   
     column1.forEach((line, index) => {
-      const yPosition = 60 + index * lineHeight;
+      const yPosition = 50 + index * lineHeight;
       doc.text(line, x1, yPosition);
     });
   
     column2.forEach((line, index) => {
-      const yPosition = 60 + index * lineHeight;
+      const yPosition = 50 + index * lineHeight;
       doc.text(line, x2, yPosition);
     });
   
-    doc.text('ERF Description:', 110, 60);
-    doc.text(erfNumber, 140, 60);
+    doc.text('ERF Description:', 110, 50);
+    doc.text(erfNumber, 140, 50);
   
-    doc.text('Market Value:', 110, 66);
-    doc.text(marketValue, 140, 66);
+    doc.text('Market Value:', 110, 54);
+    doc.text(marketValue, 140, 54);
   
-    doc.text('Street:', 110, 72);
-    doc.text(street, 140, 72);
+    doc.text('Street:', 110, 58);
+    doc.text(street, 140, 58);
   
-    doc.text('Land Area:', 110, 78);
-    doc.text('2141.0000', 140, 78);
+    doc.text('Land Area:', 110, 62);
+    doc.text('2141.0000', 140, 62);
   
-    doc.text('Deposit:', 110, 84);
-    doc.text(deposit, 140, 84);
+    doc.text('Deposit:', 110, 66);
+    doc.text(deposit, 140, 66);
   
-    doc.line(5, 110, 205, 110);
+    doc.line(5, 84, 205, 84);
   
     doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 0, 0);
-    doc.text('METER READINGS', 80, 116);
+    doc.text('METER READINGS', 80, 90);
   
     const headers = ['Meter No', 'Meter Type', 'Old Reading', 'New Reading', 'Consumption','LEVIED AMOUNT'];
     const data = [[meterNumber, meterType, oldRead, newRead, consumption, leviedAmount]];
@@ -412,21 +412,26 @@ export function Tables() {
     doc.autoTable({
       head: [headers],
       body: data,
-      startY: 120,
+      startY: 94,
       theme: 'grid',
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
+        fontSize: 7,
+        cellPadding: 1,
         valign: 'middle',
+        lineColor: [0, 0, 0]
       },
       headStyles: { fillColor: [185, 185, 185], textColor: '#000000' },
+      columnStyles: {
+        // Set the height of all columns to 20 (for example)
+        '*': { cellHeight: 8 }
+      }
     });
   
   
   
     doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
-    doc.text('ACCOUNT DETAILS', 80, 140);
+    doc.text('ACCOUNT DETAILS', 80, 110);
   
     const headers2 = ['Date', 'Code', 'Description', 'Units', 'Tariff', 'Value'];
     const data3 = [['', '', 'Opening Balance', '', '', openingBalance], [date, cashPaymentCode, cashPaymentDescription, cashPaymentUnits, cashPaymentTariff, cashPaymentValue], [date, refuseCode, refuseDescription, refuseUnits, refuseTariff, refuseValue], [date, sewerageCode, sewerageDescription, sewerageUnits, sewerageTariff, sewerageValue], [date, waterTariffDomesticCode, waterTariffDomesticDescription, waterTariffDomesticUnits, waterTariffDomesticTariff, waterTariffDomesticValue], ['', vatCode, vatDescription, vatUnits, vatTariff, vatValue], ['', interestCode, interestDescription, interestUnits, interestTariff, interestValue]];
@@ -437,11 +442,16 @@ export function Tables() {
       startY: doc.autoTable.previous.finalY + 10,
       theme: 'grid',
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
+        fontSize: 7,
+        cellPadding: 1,
         valign: 'middle',
+        lineColor: [0, 0, 0]
       },
       headStyles: { fillColor: [185, 185, 185], textColor: '#000000' },
+      columnStyles: {
+        // Set the height of all columns to 20 (for example)
+        '*': { cellHeight: 8 }
+      }
     });
 
 
@@ -454,24 +464,29 @@ export function Tables() {
       startY: doc.autoTable.previous.finalY + 6,
       theme: 'grid',
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
+        fontSize: 7,
+        cellPadding: 1,
         valign: 'middle',
+        lineColor: [0, 0, 0]
       },
       headStyles: { fillColor: [185, 185, 185], textColor: '#000000' },
+      columnStyles: {
+        // Set the height of all columns to 20 (for example)
+        '*': { cellHeight: 8 }
+      }
     });
   
    
-  
-    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(8);
     doc.setTextColor(0, 0, 0);
   
-    var remittanceText = "REMITTANCE\n" +
+    var remittanceText = "REMITTANCE ADVICE\n" +
                      `ACCOUNT NUMBER: ${accountNumber}`+"\n" +
                      `CONSUMER NAME: ${consumerName}`+"\n" +
                      `TOTAL DUE: ${closingBalance}`+"\n" 
 
-doc.text(15, doc.internal.pageSize.height - 40, remittanceText);
+doc.text(15, 179, remittanceText);
 
 // Add Banking Details
 var bankingDetailsText = "BANK NAME: FNB\n" +
@@ -480,10 +495,19 @@ var bankingDetailsText = "BANK NAME: FNB\n" +
                          "BRANCH CODE: 250655\n" +
                          "REFERENCE: 0100450001";
 
-doc.text(124, doc.internal.pageSize.height - 40, bankingDetailsText);
+doc.text(124, 179, bankingDetailsText);
+
+doc.setFont(undefined, 'bold');
+doc.setFontSize(10);
+doc.setTextColor(0, 0, 0);
+doc.text('CLICK LOGO BELOW TO SETTLE YOUR ACCOUNT', 56, 206);
+doc.setFont(undefined, 'normal');
+doc.setFontSize(8);
+doc.setTextColor(0, 0, 0);
+doc.text('Click on the logo below to go to the banking page and settle your accounts.', 54, 214);
 
 let leftYeboPay = 85;
-doc.addImage(yeboImg, "png", leftYeboPay, doc.internal.pageSize.height - 24, 30, 10);
+doc.addImage(yeboImg, "png", leftYeboPay, 222, 30, 9);
 
 var linkX = leftYeboPay;
 var linkY = doc.internal.pageSize.height - 24;

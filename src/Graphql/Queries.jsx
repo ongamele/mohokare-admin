@@ -264,3 +264,22 @@ query getAllPaymentArrangements{
     }
   }
 `;
+
+export const GET_ALL_NOTIFICATIONS = gql`
+query getAllNotifications{
+  getAllNotifications{
+    emails{
+    id
+  accountNumber
+  status
+  createdAt
+    },
+    sms{
+      id
+  accountNumber
+  status
+  createdAt
+    }
+  }
+}
+`;

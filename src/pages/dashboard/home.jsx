@@ -14,6 +14,7 @@ import {
 } from "@material-tailwind/react";
 
 import { useQuery } from "@apollo/react-hooks";
+import { CSVLink, CSVDownload } from "react-csv";
 
 
 import {
@@ -35,6 +36,7 @@ import { GET_SUCCESSFUL_EMAILS_COUNT } from "../../Graphql/Queries";
 import { GET_SUCCESSFUL_SMS_COUNT } from "../../Graphql/Queries";
 import { GET_FAILED_EMAILS_COUNT } from "../../Graphql/Queries";
 import { GET_FAILED_SMS_COUNT } from "../../Graphql/Queries";
+import{GET_ALL_NOTIFICATIONS} from '../../Graphql/Queries'
  
 export function Home() {
 
@@ -42,6 +44,7 @@ export function Home() {
   const { data: successfulSMSs } = useQuery(GET_SUCCESSFUL_SMS_COUNT);
   const { data: failedEmails } = useQuery(GET_FAILED_EMAILS_COUNT);
   const { data: failedSMSs } = useQuery(GET_FAILED_SMS_COUNT);
+  const { data: allNotifications } = useQuery(GET_ALL_NOTIFICATIONS);
 
 
   const emailsChartOptions = {
@@ -79,9 +82,24 @@ export function Home() {
       },
     },
   };
+
+  
+
+  const csvData = [];
+  csvData.push(['Type', 'Id', 'Account Number', 'Status', 'Created At']);
+
+  allNotifications?.getAllNotifications?.emails.forEach(email => {
+    csvData.push(['Email', email.id, email.accountNumber, email.status, email.createdAt]);
+  });
+  
+  // Extract SMS data
+  allNotifications?.getAllNotifications?.sms.forEach(sms => {
+    csvData.push(['SMS', sms.id, sms.accountNumber, sms.status, sms.createdAt]);
+  });
   
 
   const smsChartSeries = [Number(failedSMSs?.getFailedSmsCount), Number(successfulSMSs?.getSuccessfulSmsCount)];
+  
 
   return (
     <div className="mt-12">
@@ -174,8 +192,9 @@ export function Home() {
            }
          />
        <div className="flex gap-2">
-         <Chip value="PDF" style={{backgroundColor: "#3855E5"}}/>
-         <Chip variant="outlined" value="CSV" />
+        {/*} <Chip value="PDF" style={{backgroundColor: "#3855E5"}}/>*/}
+         <CSVLink data={csvData} filename={'data.csv'}> <Chip variant="outlined" value="CSV" /></CSVLink>
+        
        </div>
    
      </div>
