@@ -5,12 +5,8 @@ import {
   CardBody,
   CardHeader,
   Chip,
-  Input,
   Select,
   Option,
-  Popover,
-  PopoverHandler,
-  PopoverContent,
 } from "@material-tailwind/react";
 
 import { useQuery } from "@apollo/react-hooks";
@@ -25,10 +21,7 @@ import {
 } from "@heroicons/react/24/solid";
 
 import { StatisticsCard } from "@/widgets/cards";
-
-import { DayPicker } from "react-day-picker";
 import Chart from "react-apexcharts";
-import { Square3Stack3DIcon} from "@heroicons/react/24/outline";
 
 
 
@@ -39,6 +32,9 @@ import { GET_FAILED_SMS_COUNT } from "../../Graphql/Queries";
 import{GET_ALL_NOTIFICATIONS} from '../../Graphql/Queries'
  
 export function Home() {
+  const [selectedSmsReportType, setSelectedSmsReportType] = useState('');
+  const [selectedEmailReportType, setSelectedEmailReportType] = useState('');
+  const [selectedDate, setSelectedDate] = useState();
 
   const { data: successfulEmails } = useQuery(GET_SUCCESSFUL_EMAILS_COUNT);
   const { data: successfulSMSs } = useQuery(GET_SUCCESSFUL_SMS_COUNT);
@@ -46,7 +42,19 @@ export function Home() {
   const { data: failedSMSs } = useQuery(GET_FAILED_SMS_COUNT);
   const { data: allNotifications } = useQuery(GET_ALL_NOTIFICATIONS);
 
+  const handleSmsReportTypeChange = (smsType) => {
+    setSelectedSmsReportType(smsType);
+  };
 
+  const handleDateChange = (date) => {
+  
+    setSelectedDate(date);
+  };
+
+  const handleEmailReportTypeChange = (emailType) => {
+    alert(emailType)
+    setSelectedEmailReportType(emailType);
+  };
   const emailsChartOptions = {
     labels: ['Failed', 'Success'],
     colors: ['#FF4560', '#00E08A'],
@@ -83,17 +91,39 @@ export function Home() {
     },
   };
 
-  
+ 
+
+  const filteredNotifications = () => {
+    // Check if allNotifications is available and has the expected structure
+    if (allNotifications && allNotifications.getAllNotifications) {
+      const { emails, sms } = allNotifications.getAllNotifications;
+      // Filter notifications based on selected user and report type
+      const filteredEmails = emails.filter(email => {
+        return (!selectedEmailReportType || email.status === selectedEmailReportType)  &&
+        (!selectedDate || email.createdAt.includes(selectedDate));
+      });
+      const filteredSms = sms.filter(sms => {
+        return (!selectedSmsReportType || sms.status === selectedSmsReportType)  &&
+        (!selectedDate || sms.createdAt.includes(selectedDate));
+      });
+      return {
+        emails: filteredEmails,
+        sms: filteredSms
+      };
+    }
+    return { emails: [], sms: [] };
+  };
+
+  const { emails, sms } = filteredNotifications();
 
   const csvData = [];
   csvData.push(['Type', 'Id', 'Account Number', 'Status', 'Created At']);
 
-  allNotifications?.getAllNotifications?.emails.forEach(email => {
+  emails.forEach(email => {
     csvData.push(['Email', email.id, email.accountNumber, email.status, email.createdAt]);
   });
-  
-  // Extract SMS data
-  allNotifications?.getAllNotifications?.sms.forEach(sms => {
+
+  sms.forEach(sms => {
     csvData.push(['SMS', sms.id, sms.accountNumber, sms.status, sms.createdAt]);
   });
   
@@ -104,38 +134,24 @@ export function Home() {
   return (
     <div className="mt-12">
     <div className="flex space-x-4">
-     {/* Select Component */}
-     <div className="w-72">
-       <Select label="Select User">
-         <Option>John Mills</Option>
-         <Option>All</Option>
-       </Select>
-     </div>
+    <div className="w-72">
+  <Select label="Email Report Type" onChange={(e) => handleEmailReportTypeChange(e)}>
+    <Option value="Failed">Failed Emails</Option>
+    <Option value="Successful">Successful Emails</Option>
+  </Select>
+</div>
 
-     {/* Popover Component */}
-     <div className="w-72">
-     <Popover placement="bottom">
-       <PopoverHandler>
-         <Input
-           label="Select a Date"
-           onChange={() => null}
-         />
-       </PopoverHandler>
-       <PopoverContent>
-         <DayPicker
-           // ... (rest of your DayPicker props)
-         />
-       </PopoverContent>
-     </Popover>
-    
-   </div>
+
+   
+<div className="w-72 border border-gray-300 p-2" style={{borderRadius: 6}}>
+  <label htmlFor="date">Date</label>
+  <input type="date" id="date" name="date" onChange={(e) => handleDateChange(e.target.value)} />
+</div>
+
    <div className="w-72">
-       <Select label="Report Type">
-         <Option>Failed SMSs</Option>
-         <Option>Successful SMSs</Option>
-         <Option>Failed Emails</Option>
-         <Option>Successful Emails</Option>
-         <Option>All</Option>
+       <Select label="SMS Report Type" onChange={(e) => handleSmsReportTypeChange(e)}>
+         <Option value="Failed">Failed SMSs</Option>
+         <Option value="Successful">Successful SMSs</Option>
        </Select>
      </div>
  </div>
