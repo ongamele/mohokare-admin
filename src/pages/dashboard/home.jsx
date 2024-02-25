@@ -29,7 +29,11 @@ import { GET_SUCCESSFUL_EMAILS_COUNT } from "../../Graphql/Queries";
 import { GET_SUCCESSFUL_SMS_COUNT } from "../../Graphql/Queries";
 import { GET_FAILED_EMAILS_COUNT } from "../../Graphql/Queries";
 import { GET_FAILED_SMS_COUNT } from "../../Graphql/Queries";
-import{GET_ALL_NOTIFICATIONS} from '../../Graphql/Queries'
+import{GET_ALL_NOTIFICATIONS} from '../../Graphql/Queries';
+
+import { GET_FAILED_PAYMENT_REMINDERS_COUNT } from "../../Graphql/Queries";
+import { GET_SUCCESSFUL_PAYMENT_REMINDERS_COUNT } from "../../Graphql/Queries";
+import { BellAlertIcon } from "@heroicons/react/24/outline";
  
 export function Home() {
   const [selectedSmsReportType, setSelectedSmsReportType] = useState('');
@@ -42,6 +46,12 @@ export function Home() {
   const { data: failedSMSs } = useQuery(GET_FAILED_SMS_COUNT);
   const { data: allNotifications } = useQuery(GET_ALL_NOTIFICATIONS);
 
+
+  const { data: failedPaymentReminders } = useQuery(GET_FAILED_PAYMENT_REMINDERS_COUNT);
+  const { data: successfulPaymentReminders } = useQuery(GET_SUCCESSFUL_PAYMENT_REMINDERS_COUNT);
+
+
+  {successfulPaymentReminders && console.log(JSON.stringify(successfulPaymentReminders))}
   const handleSmsReportTypeChange = (smsType) => {
     setSelectedSmsReportType(smsType);
   };
@@ -52,7 +62,7 @@ export function Home() {
   };
 
   const handleEmailReportTypeChange = (emailType) => {
-    alert(emailType)
+    
     setSelectedEmailReportType(emailType);
   };
   const emailsChartOptions = {
@@ -76,6 +86,28 @@ export function Home() {
 
 
   const smsChartOptions = {
+    labels: ['Failed', 'Success'],
+    colors: ['#FF4560', '#00E08A'],
+    legend: {
+      show: true,
+      position: 'bottom',
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '65%',
+        },
+      },
+    },
+  };
+
+
+
+  
+  const paymentRemindersChartSeries = [Number(failedPaymentReminders?.getFailedPaymentRemindersCount), Number(successfulPaymentReminders?.getSuccessfulPaymentRemindersCount)];
+
+
+  const paymentRemindersChartOptions = {
     labels: ['Failed', 'Success'],
     colors: ['#FF4560', '#00E08A'],
     legend: {
@@ -156,7 +188,7 @@ export function Home() {
      </div>
  </div>
  <br />
-  <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+  <div className="mb-12 grid gap-y-10 gap-x-4 md:grid-cols-2 xl:grid-cols-4">
          <StatisticsCard
            title="Successful SMSs"
            icon={React.createElement(ChatBubbleOvalLeftIcon, {
@@ -218,76 +250,111 @@ export function Home() {
 
 
      <br/>
-     <div className="flex flex-wrap gap-4">
-     <Card>
-        <CardHeader
-          floated={false}
-          shadow={false}
-          color="transparent"
-          className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
-        >
-          <div className="w-max rounded-lg p-5 text-white" style={{backgroundColor: '#FF92B0'}}>
-            <ChatBubbleLeftIcon className="h-6 w-6" />
-          </div>
-          <div>
-            <Typography variant="h6" color="blue-gray">
-              SMSs
-            </Typography>
-            <Typography
-              variant="small"
-              color="gray"
-              className="max-w-sm font-normal"
-            >
-              Successful SMSs vs Unsuccessful SMSs
-             
-            </Typography>
-          </div>
-        </CardHeader>
-        <CardBody className="px-2 pb-0">
+     <div className="flex gap-3">
+  <div className="flex flex-col gap-3">
+    <Card>
+      <CardHeader
+        floated={false}
+        shadow={false}
+        color="transparent"
+        className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+      >
+        <div className="w-max rounded-lg p-5 text-white" style={{backgroundColor: '#FF92B0'}}>
+          <ChatBubbleLeftIcon className="h-6 w-6" />
+        </div>
+        <div>
+          <Typography variant="h6" color="blue-gray">
+            SMSs
+          </Typography>
+          <Typography
+            variant="small"
+            color="gray"
+            className="max-w-sm font-normal"
+          >
+            Successful SMSs vs Unsuccessful SMSs
+          </Typography>
+        </div>
+      </CardHeader>
+      <CardBody className="px-2 pb-0">
         <Chart
-        options={smsChartOptions}
-        series={smsChartSeries}
-        type="donut"
-        width="380"
-      />
-    
-        </CardBody>
-      </Card>
-      <Card>
-        <CardHeader
-          floated={false}
-          shadow={false}
-          color="transparent"
-          className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
-        >
-          <div className="w-max rounded-lg  p-5 text-white" style={{backgroundColor: '#F49C43'}}>
-            <EnvelopeIcon className="h-6 w-6" />
-          </div>
-          <div>
-            <Typography variant="h6" color="blue-gray">
-              Emails
-            </Typography>
-            <Typography
-              variant="small"
-              color="gray"
-              className="max-w-sm font-normal"
-            >
-             Successful emails vs unsuccessful emails
-             
-            </Typography>
-          </div>
-        </CardHeader>
-        <CardBody className="px-2 pb-0">
+          options={smsChartOptions}
+          series={smsChartSeries}
+          type="donut"
+          width="320"
+        />
+      </CardBody>
+    </Card>
+  </div>
+  <div className="flex flex-col gap-3">
+    <Card>
+      <CardHeader
+        floated={false}
+        shadow={false}
+        color="transparent"
+        className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+      >
+        <div className="w-max rounded-lg  p-5 text-white" style={{backgroundColor: '#F49C43'}}>
+          <EnvelopeIcon className="h-6 w-6" />
+        </div>
+        <div>
+          <Typography variant="h6" color="blue-gray">
+            Emails
+          </Typography>
+          <Typography
+            variant="small"
+            color="gray"
+            className="max-w-sm font-normal"
+          >
+            Successful emails vs unsuccessful emails
+          </Typography>
+        </div>
+      </CardHeader>
+      <CardBody className="px-2 pb-0">
         <Chart
-        options={emailsChartOptions}
-        series={emailsChartSeries}
-        type="donut"
-        width="380"
-      />
-    
-        </CardBody>
-      </Card>
-      </div>
+          options={emailsChartOptions}
+          series={emailsChartSeries}
+          type="donut"
+          width="320"
+        />
+      </CardBody>
+    </Card>
+  </div>
+  <div className="flex flex-col gap-3">
+    <Card>
+      <CardHeader
+        floated={false}
+        shadow={false}
+        color="transparent"
+        className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
+      >
+        <div className="w-max rounded-lg  p-5 text-white" style={{backgroundColor: '#300D9C'}}>
+          <BellAlertIcon className="h-6 w-6" />
+        </div>
+        <div>
+          <Typography variant="h6" color="blue-gray">
+            Payment Reminders
+          </Typography>
+          <Typography
+            variant="small"
+            color="gray"
+            className="max-w-sm font-normal"
+          >
+            Successful reminders vs unsuccessful reminders
+          </Typography>
+        </div>
+      </CardHeader>
+      <CardBody className="px-2 pb-0">
+        <Chart
+          options={paymentRemindersChartOptions}
+          series={paymentRemindersChartSeries}
+          type="donut"
+          width="320"
+        />
+      </CardBody>
+    </Card>
+  </div>
+</div>
+
     </div>
   );
 }

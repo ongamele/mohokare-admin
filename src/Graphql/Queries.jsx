@@ -283,3 +283,16 @@ query getAllNotifications{
   }
 }
 `;
+
+
+export const GET_FAILED_PAYMENT_REMINDERS_COUNT = gql`
+query getFailedPaymentRemindersCount{
+  getFailedPaymentRemindersCount
+}
+`
+
+export const GET_SUCCESSFUL_PAYMENT_REMINDERS_COUNT = gql`
+query getSuccessfulPaymentRemindersCount{
+  getSuccessfulPaymentRemindersCount
+}
+`

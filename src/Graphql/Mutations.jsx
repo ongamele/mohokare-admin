@@ -67,3 +67,9 @@ export const UPDATE_USER_DETAILS = gql`
     updateUserDetails(accountNumber: $accountNumber, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, email: $email)
   }
 `;
+
+export const CREATE_PAYMENT_REMINDERS = gql`
+  mutation createPaymentReminders($age: String, $notificationType: String, $message: String) {
+    createPaymentReminders(age: $age, notificationType: $notificationType, message: $message)
+  }
+`;

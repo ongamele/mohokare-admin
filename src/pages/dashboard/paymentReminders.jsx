@@ -13,109 +13,97 @@ import {
   Button,
 } from "@material-tailwind/react";
 
-import { useQuery } from "@apollo/react-hooks";
-
-
-
-import { GET_SUCCESSFUL_EMAILS_COUNT } from "../../Graphql/Queries";
-import { GET_SUCCESSFUL_SMS_COUNT } from "../../Graphql/Queries";
-import { GET_FAILED_EMAILS_COUNT } from "../../Graphql/Queries";
-import { GET_FAILED_SMS_COUNT } from "../../Graphql/Queries";
+import { useMutation } from "@apollo/react-hooks";
+import { CREATE_PAYMENT_REMINDERS } from "../../Graphql/Mutations";
  
 export function PaymentReminders() {
+  const [selectedAge, setSelectedAge] = useState("");
+  const [selectedReminderType, setSelectedReminderType] = useState("");
+  const [message, setMessage] = useState("");
 
-  const { data: successfulEmails } = useQuery(GET_SUCCESSFUL_EMAILS_COUNT);
-  const { data: successfulSMSs } = useQuery(GET_SUCCESSFUL_SMS_COUNT);
-  const { data: failedEmails } = useQuery(GET_FAILED_EMAILS_COUNT);
-  const { data: failedSMSs } = useQuery(GET_FAILED_SMS_COUNT);
+  const handleAgeChange = (age) => {
+    setSelectedAge(age);
+  };
+
+  const handleReminderTypeChange = (type) => {
+    setSelectedReminderType(type);
+  };
+
+  const handleMessageChange = (message) => {
+    setMessage(message);
+  };
 
 
-  const emailsChartOptions = {
-    labels: ['Failed', 'Success'],
-    colors: ['#FF4560', '#00E08A'],
-    legend: {
-      show: true,
-      position: 'bottom',
+  const [createPaymentReminders, { loading }] = useMutation(CREATE_PAYMENT_REMINDERS, {
+    update(_, result) {
+      alert(result.data.createPaymentReminders);
     },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '65%',
-        },
-      },
-    },
+    onError(err) {
+      
+      alert(err);
+    }
+  });
+  
+  const handleSendReminders = () => {
+    if (loading) {
+      return;
+    }
+  
+    createPaymentReminders({
+      variables: {
+        notificationType: selectedReminderType,
+        age: selectedAge.toString(),
+        message
+      }
+    });
   };
   
-
-  const emailsChartSeries = [Number(failedEmails?.getFailedEmailsCount), Number(successfulEmails?.getSuccessfulEmailsCount)];
-
-
-  const smsChartOptions = {
-    labels: ['Failed', 'Success'],
-    colors: ['#FF4560', '#00E08A'],
-    legend: {
-      show: true,
-      position: 'bottom',
-    },
-    plotOptions: {
-      pie: {
-        donut: {
-          size: '65%',
-        },
-      },
-    },
-  };
-  
-
-  const smsChartSeries = [Number(failedSMSs?.getFailedSmsCount), Number(successfulSMSs?.getSuccessfulSmsCount)];
 
   return (
     <div className="mt-12">
-      <Card>
-        <CardHeader variant="gradient" color="" style={{backgroundColor: "#3855E5"}} className="mb-8 p-6">
-          <Typography variant="h6" color="white">
-           Send Payment Reminders
-          </Typography>
-        </CardHeader>
-        <CardBody className="px-0 pt-0 pb-2" style={{padding: 14}}>
-          <div>
-    <div className="flex space-x-4">
-     {/* Select Component */}
-     <div className="w-72">
-       <Select label="Select Age">
-         <Option value="All">All</Option>
-         <Option value="+30DAYS">+30 DAYS</Option>
-         <Option value="+60DAYS">+60 DAYS</Option>
-         <Option value="+90DAYS">+90 DAYS</Option>
-         <Option value="+120DAYS">+120 DAYS</Option>
-       </Select>
-     </div>
+    <Card>
+      <CardHeader variant="gradient" color="" style={{backgroundColor: "#3855E5"}} className="mb-8 p-6">
+        <Typography variant="h6" color="white">
+         Send Payment Reminders
+        </Typography>
+      </CardHeader>
+      <CardBody className="px-0 pt-0 pb-2" style={{padding: 14}}>
+        <div>
+          <div className="flex space-x-4">
+            {/* Select Component for Age */}
+            <div className="w-72">
+              <Select label="Select Age"  onChange={(e) => handleAgeChange(e)}>
+                <Option value="All">All</Option>
+                <Option value="days30">+30 DAYS</Option>
+                <Option value="days60">+60 DAYS</Option>
+                <Option value="days90">+90 DAYS</Option>
+                <Option value="days120">+120 DAYS</Option>
+              </Select>
+            </div>
 
-     {/* Popover Component */}
-
-   <div className="w-72">
-       <Select label="Reminder Type">
-         <Option>SMS</Option>
-         <Option>Email</Option>
-         <Option>Both</Option>
-       </Select>
-     </div>
-     
-
- </div>
- <br />
- <div className="w-96">
-      <Textarea label="Message" />
-    </div>
-    <br />
-    <Button color="blue" onClick={() => alert('Reminders sent successfully')}>
+            {/* Select Component for Reminder Type */}
+            <div className="w-72">
+              <Select label="Reminder Type" onChange={(e) => handleReminderTypeChange(e)}>
+                <Option value="SMS">SMS</Option>
+                <Option value="Email">Email</Option>
+                <Option value="Both">Both</Option>
+              </Select>
+            </div>
+          </div>
+          <br />
+          {/* Textarea Component for Message */}
+          <div className="w-96">
+            <Textarea label="Message" value={message} onChange={(e) => handleMessageChange(e.target.value)} />
+          </div>
+          <br />
+          
+          <Button color="blue" onClick={handleSendReminders}>
             Send Reminders
           </Button>
-</div>
+        </div>
       </CardBody>
-      </Card>
-  
-    </div>
+    </Card>
+  </div>
   );
 }
 
