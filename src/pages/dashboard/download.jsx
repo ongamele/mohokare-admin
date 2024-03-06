@@ -159,7 +159,7 @@ const accountNumber = param.accountNumber;
     const deposit = statementData?.getStatement?.deposit || '';
     const current = statementData?.getStatement?.current || '';
     const closingBalance = statementData?.getStatement?.closingBalance || '';
-    const openingBalance = Number(current) - Number(closingBalance);
+    const openingBalance = Number(closingBalance) - Number(current);
 
 
     
@@ -411,7 +411,7 @@ var linkHeight = 10;
     <>
   
 
-    <h1 >Thanky You. From Mohokare</h1>
+    <h1 style={{textAlign: "center"}}>Thanky You. From Mohokare</h1>
       
     </>
   );

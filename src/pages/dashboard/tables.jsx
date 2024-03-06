@@ -13,13 +13,8 @@ import {
 Select,
 Option
 } from "@material-tailwind/react";
-import { authorsTableData, projectsTableData } from "@/data";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import { PencilIcon, EyeIcon } from "@heroicons/react/24/outline";
-import imgSrc from "../../images/municipalityLogo.jpg";
-import yeboPayLogo from "../../images/yeboPay-logo.png";
 import { GET_ALL_STATEMENTS } from "../../Graphql/Queries";
 import { GET_METER_READINGS } from "../../Graphql/Queries";
 import { GET_STATEMENT } from "../../Graphql/Queries";
@@ -112,413 +107,7 @@ export function Tables() {
     },
   });
 
-  const {
-    loading: cashPaymentDataLoading,
-    data: cashPaymentData,
-    refetch: refetchCashPaymentData,
-  } = useQuery(GET_CASH_PAYMENT, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      setCashPaymentObj(data.getCashPayment)
-      
-      if (meterData) {
-        //generatePDF(meterData, statementData);
-      }
-    },
-  });
 
-
-  const {
-    loading: interestDataLoading,
-    data: interestData,
-    refetch: refetchInterestData,
-  } = useQuery(GET_INTEREST, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      //console.log('Interest data loaded:', data);
-      setInterestObj(data.getInterest);
-      
-      if (meterData) {
-        //generatePDF(meterData, statementData,);
-      }
-    },
-  });
-
-
-
-  const {
-    loading: refuseDataLoading,
-    data: refuseData,
-    refetch: refetchRefuseData,
-  } = useQuery(GET_REFUSE, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      setrefuseObj(data.getRefuse);
-      
-      if (meterData) {
-        //generatePDF(meterData, statementData,);
-      }
-    },
-  });
-
-
-  const {
-    loading: sewerageDataLoading,
-    data: sewerageData,
-    refetch: refetchSewerageData,
-  } = useQuery(GET_SEWERAGE, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      
-      setSewerageObj(data.getSewerage)
-      if (meterData) {
-        //generatePDF(meterData, statementData,);
-      }
-    },
-  });
-
-
-  const {
-    loading: vatDataLoading,
-    data: vatData,
-    refetch: refetchSVatData,
-  } = useQuery(GET_VAT, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      
-      setVatObj(data.getVat)
-      if (meterData) {
-        //generatePDF(meterData, statementData,);
-      }
-    },
-  });
-
-
-  const {
-    loading: waterTariffDomesticDataLoading,
-    data: waterTariffDomesticData,
-    refetch: refetchSWaterTariffDomesticData,
-  } = useQuery(GET_WATER_TARIFF_DOMESTIC, {
-    variables: { accountNumber },
-    onCompleted: (data) => {
-      // Handle completed statementData query
-      
-      setWaterTariffDomesticObj(data.getWaterTariffDomestic);
-      if (meterData) {
-        //generatePDF(meterData, statementData,);
-      }
-    },
-  });
-
-  const handleClickDownload = async (accNumber) => {
-    setAccountNumber(accNumber); 
-    await handleOpen()
-  }
-
-
-
-  const manageDownload = async () => {
-    
-    var selectedStatement = {};
-
-    selectedStatement.meterReadings = meterObj;
-    selectedStatement.details = detailsObj;
-    selectedStatement.cashPayment = cashPaymentObj;
-    selectedStatement.interest = interestObj;
-    selectedStatement.refuse = refuseObj;
-    selectedStatement.sewerage = sewerageObj;
-    selectedStatement.vat = vatObj;
-    selectedStatement.waterTariffDomestic = waterTariffDomesticObj;
-
-  
-
-    await generatePDF(selectedStatement);
-
-    await handleOpen();
-}
-
-  const generatePDF = async (selectedStatement) => {
-   
-   
-    const postalAddress1 = selectedStatement?.details?.postalAddress1 || '';
-    const postalAddress2 = selectedStatement?.details?.postalAddress2 || '';
-    const postalCode = selectedStatement?.details?.postalCode || '';
-    const consumerName = selectedStatement?.details?.consumerName || '';
-    const accountNumber = selectedStatement?.details?.accountNumber || '';
-    const vatNumber = selectedStatement?.details?.vatNumber || '';
-    const taxNumber = selectedStatement?.details?.taxNumber || '';
-    const date = selectedStatement?.details?.date || '';
-
-    
-
-    const phoneNumber = selectedStatement?.details?.date || '';
-    const email = selectedStatement?.details?.email || '';
-    const province = selectedStatement?.details?.province || '';
-    const town = selectedStatement?.details?.town || '';
-    const suburb = selectedStatement?.details?.suburb || '';
-    const ward = selectedStatement?.details?.ward || '';
-    const street = selectedStatement?.details?.street || '';
-    const marketValue = selectedStatement?.details?.marketValue || '';
-    const erfNumber = selectedStatement?.details?.erfNumber || '';
-    const days120 = selectedStatement?.details?.days120 || '';
-    const days90 = selectedStatement?.details?.days90 || '';
-    const days60 = selectedStatement?.details?.days60 || '';
-    const days30 = selectedStatement?.details?.days30 || '0';
-    const deposit = selectedStatement?.details?.deposit || '';
-    const current = selectedStatement?.details?.current || '';
-    const closingBalance = selectedStatement?.details?.closingBalance || '';
-    const openingBalance = Number(current) - Number(closingBalance);
-
-
-    
-    const meterNumber = selectedStatement?.meterReadings?.meterNumber || '';
-    const meterType =selectedStatement?.meterReadings?.type || '';
-    const oldRead = selectedStatement?.meterReadings?.oldRead || '';
-    const newRead = selectedStatement?.meterReadings?.newRead || '';
-    const consumption = selectedStatement?.meterReadings?.consumption || '';
-    const leviedAmount = selectedStatement?.meterReadings?.leviedAmount || '';
-    
-
-    const cashPaymentDate = selectedStatement?.cashPayment?.date || '';
-    const cashPaymentCode = '';
-    const cashPaymentDescription = 'Cash Payment';
-    const cashPaymentUnits = selectedStatement?.cashPayment?.units || '';
-    const cashPaymentTariff = '000000';
-    const cashPaymentValue = selectedStatement?.cashPayment?.value || '';
-
-    const interestDate = selectedStatement?.interest?.date || '';
-    const interestCode = '009009';
-    const interestDescription = 'Interest';
-    const interestUnits = selectedStatement?.interest?.units || '';
-    const interestTariff = '';
-    const interestValue = selectedStatement?.interest?.value || '';
-
-    const refuseDate = selectedStatement?.refuse?.date || '';
-    const refuseCode = '050010';
-    const refuseDescription = 'Refuse';
-    const refuseUnits = selectedStatement?.refuse?.units || '';
-    const refuseTariff = '72.430000';
-    const refuseValue = selectedStatement?.refuse?.value || '';
-
-    const sewerageDate = selectedStatement?.sewerage?.date || '';
-    const sewerageCode = '050010';
-    const sewerageDescription = 'Sewerage';
-    const sewerageUnits = selectedStatement?.sewerage?.units || '';
-    const sewerageTariff = '126.870000';
-    const sewerageValue = selectedStatement?.sewerage?.value || '';
-
-
-    const vatDate = selectedStatement?.vat?.date || '';
-    const vatCode = '008888';
-    const vatDescription = 'VAT';
-    const vatUnits = selectedStatement?.vat?.units || '';
-    const vatTariff = '';
-    const vatValue = selectedStatement?.vat?.value || '';
-
-    const waterTariffDomesticeDate = selectedStatement?.waterTariffDomestic?.date || '';
-    const waterTariffDomesticCode = '041001';
-    const waterTariffDomesticDescription = 'Water';
-    const waterTariffDomesticUnits = selectedStatement?.waterTariffDomestic?.units || '';
-    const waterTariffDomesticTariff = '12.000000';
-    const waterTariffDomesticValue = selectedStatement?.waterTariffDomestic?.value || '';
-    
-    
-
-
-
-
-    let left = 20;
-    let top = 6;
-    const imgWidth = 40;
-    const imgHeight = 20;
-  
-    const doc = new jsPDF();
-    var img = new Image();
-    var yeboImg = new Image();
-    img.src = imgSrc;
-    yeboImg.src = yeboPayLogo;
-    doc.addImage(img, "png", left, top, imgWidth, imgHeight);
-
-        // Add a border around the entire PDF
-    doc.rect(5, 5, 200, 286);
-  
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.text('MOHOKARE LOCAL MUNICIPALITY', 140, 10);
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(8);
-    doc.text('MOHOKARE LOCAL MUNICIPALITY', 140, 14);
-    doc.text('1 Hoofd Street, Zastron 9950', 140, 18);
-    doc.text('Tel:(051) 673 9600', 140, 22);
-    doc.text('Fax: (051) 673 1550', 140, 26);
-    doc.text(`Vat No.: ${vatNumber}`, 140, 30);
-  
-    doc.line(5, 34, 205, 34);
-  
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont(undefined, 'bold');
-    doc.text('TAX INVOICE/STATEMENT OF ACCOUNT', 70, 40);
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(8);
-  
-    const column1 = ['Account Number:', 'Consumer Name:', 'Postal Address:', 'Postal Code:', 'Internet Pin:', 'Account Date:', 'Tax Invoice No.:', 'Vat Registration No.:'];
-    const column2 = [accountNumber, consumerName, postalAddress2, postalCode, '',date, taxNumber, vatNumber, ''];
-  
-    const x1 = 20;
-    const x2 = 50;
-    const lineHeight = 4;
-  
-    column1.forEach((line, index) => {
-      const yPosition = 50 + index * lineHeight;
-      doc.text(line, x1, yPosition);
-    });
-  
-    column2.forEach((line, index) => {
-      const yPosition = 50 + index * lineHeight;
-      doc.text(line, x2, yPosition);
-    });
-  
-    doc.text('ERF Description:', 110, 50);
-    doc.text(erfNumber, 140, 50);
-  
-    doc.text('Market Value:', 110, 54);
-    doc.text(marketValue, 140, 54);
-  
-    doc.text('Street:', 110, 58);
-    doc.text(street, 140, 58);
-  
-    doc.text('Land Area:', 110, 62);
-    doc.text('2141.0000', 140, 62);
-  
-    doc.text('Deposit:', 110, 66);
-    doc.text(deposit, 140, 66);
-  
-    doc.line(5, 84, 205, 84);
-  
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(0, 0, 0);
-    doc.text('METER READINGS', 80, 90);
-  
-    const headers = ['Meter No', 'Meter Type', 'Old Reading', 'New Reading', 'Consumption','LEVIED AMOUNT'];
-    const data = [[meterNumber, meterType, oldRead, newRead, consumption, leviedAmount]];
-  
-    doc.autoTable({
-      head: [headers],
-      body: data,
-      startY: 94,
-      theme: 'grid',
-      styles: {
-        fontSize: 7,
-        cellPadding: 1,
-        valign: 'middle',
-        lineColor: [0, 0, 0]
-      },
-      headStyles: { fillColor: [185, 185, 185], textColor: '#000000' },
-      columnStyles: {
-        // Set the height of all columns to 20 (for example)
-        '*': { cellHeight: 8 }
-      }
-    });
-  
-  
-  
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text('ACCOUNT DETAILS', 80, 110);
-  
-    const headers2 = ['Date', 'Code', 'Description', 'Units', 'Tariff', 'Value'];
-    const data3 = [['', '', 'Opening Balance', '', '', openingBalance], [date, cashPaymentCode, cashPaymentDescription, cashPaymentUnits, cashPaymentTariff, cashPaymentValue], [date, refuseCode, refuseDescription, refuseUnits, refuseTariff, refuseValue], [date, sewerageCode, sewerageDescription, sewerageUnits, sewerageTariff, sewerageValue], [date, waterTariffDomesticCode, waterTariffDomesticDescription, waterTariffDomesticUnits, waterTariffDomesticTariff, waterTariffDomesticValue], ['', vatCode, vatDescription, vatUnits, vatTariff, vatValue], ['', interestCode, interestDescription, interestUnits, interestTariff, interestValue]];
-  
-    doc.autoTable({
-      head: [headers2],
-      body: data3,
-      startY: doc.autoTable.previous.finalY + 10,
-      theme: 'grid',
-      styles: {
-        fontSize: 7,
-        cellPadding: 1,
-        valign: 'middle',
-        lineColor: [0, 0, 0]
-      },
-      headStyles: { fillColor: [185, 185, 185], textColor: '#000000' },
-      columnStyles: {
-        // Set the height of all columns to 20 (for example)
-        '*': { cellHeight: 8 }
-      }
-    });
-
-
-    const daysHeaders = ['120+ Days', '90 Days', '60 Days', '30 Days', 'Current', 'Closing Balance'];
-    const daysData = [[days120, days90, days60, days30, current, closingBalance]];
-  
-    doc.autoTable({
-      head: [daysHeaders],
-      body: daysData,
-      startY: doc.autoTable.previous.finalY + 6,
-      theme: 'grid',
-      styles: {
-        fontSize: 7,
-        cellPadding: 1,
-        valign: 'middle',
-        lineColor: [0, 0, 0]
-      },
-      headStyles: { fillColor: [185, 185, 185], textColor: '#000000' },
-      columnStyles: {
-        // Set the height of all columns to 20 (for example)
-        '*': { cellHeight: 8 }
-      }
-    });
-  
-   
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-  
-    var remittanceText = "REMITTANCE ADVICE\n" +
-                     `ACCOUNT NUMBER: ${accountNumber}`+"\n" +
-                     `CONSUMER NAME: ${consumerName}`+"\n" +
-                     `TOTAL DUE: ${closingBalance}`+"\n" 
-
-doc.text(15, 179, remittanceText);
-
-// Add Banking Details
-var bankingDetailsText = "BANK NAME: FNB\n" +
-                         "ACCOUNT NAME: Mohokare Local Municipality\n" +
-                         "ACCOUNT NUMBER: 53593549308\n" +
-                         "BRANCH CODE: 250655\n" +
-                         "REFERENCE: 0100450001";
-
-doc.text(124, 179, bankingDetailsText);
-
-doc.setFont(undefined, 'bold');
-doc.setFontSize(10);
-doc.setTextColor(0, 0, 0);
-doc.text('CLICK LOGO BELOW TO SETTLE YOUR ACCOUNT', 56, 206);
-doc.setFont(undefined, 'normal');
-doc.setFontSize(8);
-doc.setTextColor(0, 0, 0);
-doc.text('Click on the logo below to go to the banking page and settle your accounts.', 54, 214);
-
-let leftYeboPay = 85;
-doc.addImage(yeboImg, "png", leftYeboPay, 222, 30, 9);
-
-var linkX = leftYeboPay;
-var linkY = doc.internal.pageSize.height - 24;
-var linkWidth = 30;
-var linkHeight = 10;
-
-// Add a transparent link over the image
-doc.link(linkX, linkY, linkWidth, linkHeight, { url: "https://neon-wisp-b1da94.netlify.app" });
-  
-    doc.save('statement.pdf'); 
-  };
   
 
 
@@ -643,42 +232,14 @@ doc.link(linkX, linkY, linkWidth, linkHeight, { url: "https://neon-wisp-b1da94.n
       setEmail(statementData.getStatement.email);
     }
   }, [statementData]);
+
+
+  const handleRedirect = (accountNumber) => {
+    const url = `https://mohokare-admin.netlify.app/download/${accountNumber}`;
+    window.open(url, '_blank');
+  };
   return (
     <>
-  
-      <Dialog open={open} handler={handleOpen}>
-        <DialogHeader>
-          <Typography variant="h5" color="blue-gray">
-            Mohokare Local Municipality
-          </Typography>
-        </DialogHeader>
-        <DialogBody divider className="grid place-items-center gap-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="blue"
-            className="h-16 w-16 text-red-500"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <Typography color="black" variant="h4">
-            Download Statement
-          </Typography>
-        </DialogBody>
-        <DialogFooter className="space-x-2">
-          <Button variant="text" color="blue-gray" onClick={handleOpen}>
-            close
-          </Button>
-          <Button variant="gradient" onClick={() => manageDownload()}>
-            Ok
-          </Button>
-        </DialogFooter>
-      </Dialog>
-
       <Dialog
         open={
           openStat
@@ -690,7 +251,7 @@ doc.link(linkX, linkY, linkWidth, linkHeight, { url: "https://neon-wisp-b1da94.n
         <DialogBody>
 
 
-<Card>
+      <Card>
       
       <CardHeader variant="gradient" color="" style={{backgroundColor: "#3855E5"}} className="mb-8 p-6">
         <Typography variant="h6" color="white">
@@ -981,9 +542,7 @@ doc.link(linkX, linkY, linkWidth, linkHeight, { url: "https://neon-wisp-b1da94.n
           </Button>
         </DialogFooter>
       </Dialog>
-      <Button variant="text" color="blue" onClick={handleOpen}  className="mr-1">
-            Download all statements
-          </Button>
+    
     <div className="mt-12 mb-8 flex flex-col gap-12">
 
       
@@ -1071,7 +630,7 @@ doc.link(linkX, linkY, linkWidth, linkHeight, { url: "https://neon-wisp-b1da94.n
                     <Typography
                       className="text-xs font-semibold text-blue-gray-500"
                       style={{cursor: 'pointer'}}
-                      onClick={() => handleClickDownload(statement.accountNumber)}
+                      onClick={() => handleRedirect(statement.accountNumber)}
                     >
                       Download
                     </Typography>

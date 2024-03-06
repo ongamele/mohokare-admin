@@ -28,11 +28,11 @@ export function Sidenav({ brandImg, brandName, routes }) {
       <div
         className={`relative`}
       >
-        <Link to="/" className="py-6 px-8 text-center">
+        <Link to="/" className="py-8 px-10 text-center">
       
             <img
           src={logoSmall}
-          className="h-full w-full object-cover rounded-3xl" style={{width: 80, margin: 'auto'}}
+          className="h-full w-full object-cover rounded-3xl" style={{width: 128, margin: 'auto'}}
         />
         </Link>
         <IconButton
