@@ -38,7 +38,8 @@ import { BellAlertIcon } from "@heroicons/react/24/outline";
 export function Home() {
   const [selectedSmsReportType, setSelectedSmsReportType] = useState('');
   const [selectedEmailReportType, setSelectedEmailReportType] = useState('');
-  const [selectedDate, setSelectedDate] = useState();
+  const [fromDate, setFromDate] = useState();
+  const [toDate, setToDate] = useState();
 
   const { data: successfulEmails } = useQuery(GET_SUCCESSFUL_EMAILS_COUNT);
   const { data: successfulSMSs } = useQuery(GET_SUCCESSFUL_SMS_COUNT);
@@ -51,7 +52,7 @@ export function Home() {
   const { data: successfulPaymentReminders } = useQuery(GET_SUCCESSFUL_PAYMENT_REMINDERS_COUNT);
 
 
-  {successfulPaymentReminders && console.log(JSON.stringify(successfulPaymentReminders))}
+
   const handleSmsReportTypeChange = (smsType) => {
     setSelectedSmsReportType(smsType);
   };
@@ -123,21 +124,45 @@ export function Home() {
     },
   };
 
- 
+
 
   const filteredNotifications = () => {
     // Check if allNotifications is available and has the expected structure
     if (allNotifications && allNotifications.getAllNotifications) {
       const { emails, sms } = allNotifications.getAllNotifications;
-      // Filter notifications based on selected user and report type
-      const filteredEmails = emails.filter(email => {
-        return (!selectedEmailReportType || email.status === selectedEmailReportType)  &&
-        (!selectedDate || email.createdAt.includes(selectedDate));
-      });
-      const filteredSms = sms.filter(sms => {
-        return (!selectedSmsReportType || sms.status === selectedSmsReportType)  &&
-        (!selectedDate || sms.createdAt.includes(selectedDate));
-      });
+      let filteredEmails = [];
+      let filteredSms = [];
+      
+      if (selectedEmailReportType === "FailedEmails") {
+        // Filter notifications based on selected user and report type
+        filteredEmails = emails.filter(email => {
+          return (!selectedEmailReportType || email.status === 'Failed') &&
+                 (!fromDate || email.createdAt >= fromDate) &&
+                 (!toDate || email.createdAt <= toDate);
+        });
+      } else if (selectedEmailReportType === "SuccessfulEmails") {
+        // Filter notifications based on selected user and report type
+        filteredEmails = emails.filter(email => {
+          return (!selectedEmailReportType || email.status === 'Successful') &&
+                 (!fromDate || email.createdAt >= fromDate) &&
+                 (!toDate || email.createdAt <= toDate);
+        });
+      } else if (selectedSmsReportType === "FailedSMSs") {
+        // Filter notifications based on selected user and report type
+        filteredSms = sms.filter(sms => {
+          return (!selectedSmsReportType || sms.status === "Failed") &&
+                 (!fromDate || sms.createdAt >= fromDate) &&
+                 (!toDate || sms.createdAt <= toDate);
+        });
+      } else if (selectedSmsReportType === "SuccessfulSMSs") {
+        // Filter notifications based on selected user and report type
+        filteredSms = sms.filter(sms => {
+          return (!selectedSmsReportType || sms.status === "Successful") &&
+                 (!fromDate || sms.createdAt >= fromDate) &&
+                 (!toDate || sms.createdAt <= toDate);
+        });
+      }
+      
       return {
         emails: filteredEmails,
         sms: filteredSms
@@ -145,19 +170,20 @@ export function Home() {
     }
     return { emails: [], sms: [] };
   };
-
+  
   const { emails, sms } = filteredNotifications();
-
+  
   const csvData = [];
   csvData.push(['Type', 'Id', 'Account Number', 'Status', 'Created At']);
-
+  
   emails.forEach(email => {
     csvData.push(['Email', email.id, email.accountNumber, email.status, email.createdAt]);
   });
-
-  sms.forEach(sms => {
-    csvData.push(['SMS', sms.id, sms.accountNumber, sms.status, sms.createdAt]);
+  
+  sms.forEach(text => {
+    csvData.push(['SMS', text.id, text.accountNumber, text.status, text.createdAt]);
   });
+  
   
 
   const smsChartSeries = [Number(failedSMSs?.getFailedSmsCount), Number(successfulSMSs?.getSuccessfulSmsCount)];
@@ -168,24 +194,23 @@ export function Home() {
     <div className="flex space-x-4">
     <div className="w-72">
   <Select label="Email Report Type" onChange={(e) => handleEmailReportTypeChange(e)}>
-    <Option value="Failed">Failed Emails</Option>
-    <Option value="Successful">Successful Emails</Option>
+    <Option value="FailedEmails">Failed Emails</Option>
+    <Option value="SuccessfulEmails">Successful Emails</Option>
+    <Option value="FailedSMSs">Failed SMSs</Option>
+    <Option value="SuccessfulSMSs">Successful SMSs</Option>
   </Select>
 </div>
 
-
-   
 <div className="w-72 border border-gray-300 p-2" style={{borderRadius: 6}}>
-  <label htmlFor="date">Date</label>
-  <input type="date" id="date" name="date" onChange={(e) => handleDateChange(e.target.value)} />
+  <label htmlFor="fromDate">From </label>
+  <input type="date" id="fromDate" name="fromDate" onChange={(e) => setFromDate(e.target.value)} />
 </div>
 
-   <div className="w-72">
-       <Select label="SMS Report Type" onChange={(e) => handleSmsReportTypeChange(e)}>
-         <Option value="Failed">Failed SMSs</Option>
-         <Option value="Successful">Successful SMSs</Option>
-       </Select>
-     </div>
+<div className="w-72 border border-gray-300 p-2" style={{borderRadius: 6}}>
+  <label htmlFor="toDate">To </label>
+  <input type="date" id="toDate" name="toDate" onChange={(e) => setToDate(e.target.value)} />
+</div>
+
  </div>
  <br />
   <div className="mb-12 grid gap-y-10 gap-x-4 md:grid-cols-2 xl:grid-cols-4">

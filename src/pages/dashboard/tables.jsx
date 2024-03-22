@@ -18,12 +18,6 @@ import { PencilIcon, EyeIcon } from "@heroicons/react/24/outline";
 import { GET_ALL_STATEMENTS } from "../../Graphql/Queries";
 import { GET_METER_READINGS } from "../../Graphql/Queries";
 import { GET_STATEMENT } from "../../Graphql/Queries";
-import { GET_CASH_PAYMENT } from "../../Graphql/Queries";
-import { GET_INTEREST } from "../../Graphql/Queries";
-import { GET_REFUSE } from "../../Graphql/Queries";
-import { GET_SEWERAGE } from "../../Graphql/Queries";
-import { GET_VAT } from "../../Graphql/Queries";
-import { GET_WATER_TARIFF_DOMESTIC } from "../../Graphql/Queries";
 
 import { CREATE_USER_NOTIFICATIONS } from "../../Graphql/Mutations";
 import { CREATE_USER_EMAIL_NOTIFICATIONS } from "../../Graphql/Mutations";
@@ -47,19 +41,10 @@ export function Tables() {
 
  
   const handleOpenStat = () => setOpenStat(!openStat);
-  const handleOpen = () => setOpen(!open);
   const handleOpenEdit = () => setOpenEdit(!openEdit);
 
 
   const [accountNumber, setAccountNumber ] = useState('');
-  const [meterObj, setMeterObj] = useState({})
-  const [detailsObj, setDetailsObj] = useState({})
-  const [cashPaymentObj, setCashPaymentObj] = useState({})
-  const [interestObj, setInterestObj] = useState({})
-  const [refuseObj, setrefuseObj] = useState({})
-  const [sewerageObj, setSewerageObj] = useState({})
-  const [vatObj, setVatObj] = useState({})
-  const [waterTariffDomesticObj, setWaterTariffDomesticObj] = useState({})
  
   
   
@@ -209,16 +194,17 @@ export function Tables() {
   };
 
   const handleEditSubmit = async () => {
-    if(firstName && lastName && phoneNumber && email && accountNumberEdit)
-    updateUserDetails({
-      variables: {
-        accountNumber: accountNumberEdit,
-        firstName,
-        lastName,
-        phoneNumber,
-        email,
-      },
-    })}
+
+      updateUserDetails({
+        variables: {
+          accountNumber: accountNumberEdit,
+          firstName,
+          lastName,
+          phoneNumber,
+          email,
+        },
+      })
+    }
 
 
 
@@ -235,7 +221,7 @@ export function Tables() {
 
 
   const handleRedirect = (accountNumber) => {
-    const url = `https://mohokare-admin.netlify.app/download/${accountNumber}`;
+    const url = `http://localhost:5174/download/${accountNumber}`;
     window.open(url, '_blank');
   };
   return (
@@ -423,7 +409,8 @@ export function Tables() {
           Update Details
         </Typography>
       </CardHeader>
-      <CardBody className="px-0 pt-0 pb-2">
+      <CardBody className="px-0 pt-0 pb-2">4
+      
       <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6">
             <Typography variant="small" color="blue-gray" className="-mb-3 font-medium">
@@ -432,7 +419,6 @@ export function Tables() {
             <Input
               size="lg"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
               placeholder="John"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
               labelProps={{
@@ -445,7 +431,6 @@ export function Tables() {
             </Typography>
             <Input
               size="lg"
-              onChange={(e) => setLastName(e.target.value)}
               value={lastName}
               placeholder="Mills"
               className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
@@ -514,7 +499,7 @@ export function Tables() {
           onClick={() => handleEditSubmit()}
           className="mr-1"
             color="white"  style={{marginTop: 12,backgroundColor: "#3855E5"}}>
-            Save 
+            Save
           </Button>
 
        

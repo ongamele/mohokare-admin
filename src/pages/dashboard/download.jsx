@@ -36,18 +36,30 @@ export function Download() {
 
 const accountNumber = param.accountNumber;
  
-  
+function removeLeadingZero(str) {
+  // Check if the string starts with '0'
+  if (str.charAt(0) === '0') {
+      // Remove the first character (i.e., the leading zero)
+      return str.substring(1);
+  } else {
+      // If it doesn't start with '0', return the original string
+      return str;
+  }
+}
 
 
 
-  const {
-    loading: meterDataLoading,
-    data: meterData,
-    refetch: refetchMeterData,
-  } = useQuery(GET_METER_READINGS, {
-    variables: { accountNumber },
- 
-  });
+const {
+  loading: meterDataLoading,
+  data: meterData,
+  refetch: refetchMeterData
+} = useQuery(GET_METER_READINGS, {
+  variables: { accountNumber: removeLeadingZero(accountNumber) }
+});
+
+
+
+
 
   const {
     loading: statementDataLoading,
@@ -119,11 +131,14 @@ const accountNumber = param.accountNumber;
  
   });
 
+
+
   useEffect(() => {
-    if (!statementDataLoading && statementData && !meterDataLoading && !cashPaymentDataLoading && !interestDataLoading && !refuseDataLoading && !sewerageDataLoading && !vatDataLoading && cashPaymentData) {
+    if (!statementDataLoading && statementData && !meterDataLoading && !cashPaymentDataLoading && !waterTariffDomesticDataLoading && !interestDataLoading && !refuseDataLoading && !sewerageDataLoading && !vatDataLoading && cashPaymentData) {
+    
       generatePDF();
     }
-  }, [statementDataLoading, statementData, meterData, interestData, vatData, waterTariffDomesticData, sewerageData, refuseData, cashPaymentData]);
+  }, [statementData, statementData, meterData, interestData, vatData, waterTariffDomesticData, sewerageData, refuseData, cashPaymentData]);
 
 
 
@@ -141,7 +156,11 @@ const accountNumber = param.accountNumber;
     const taxNumber = await statementData?.getStatement?.taxNumber || '';
     const date = await statementData?.getStatement?.date || '';
 
-    
+    let d120 = statementData?.getStatement?.days120.toFixed(2) || 0;
+    let d90 = statementData?.getStatement?.days90.toFixed(2) || 0;
+    let d60 = statementData?.getStatement?.days60.toFixed(2) || 0;
+    let d30 = statementData?.getStatement?.days30.toFixed(2) || 0;
+    let dCurrent = statementData?.getStatement?.current.toFixed(2) || 0;
 
     const phoneNumber = statementData?.getStatement?.date || '';
     const email = statementData?.getStatement?.email || '';
@@ -152,12 +171,12 @@ const accountNumber = param.accountNumber;
     const street = statementData?.getStatement.street || '';
     const marketValue = statementData?.getStatement?.marketValue || '';
     const erfNumber = statementData?.getStatement?.erfNumber || '';
-    const days120 = statementData?.getStatement?.days120 || '';
-    const days90 = statementData?.getStatement?.days90 || '';
-    const days60 = statementData?.getStatement?.days60 || '';
-    const days30 = statementData?.getStatement?.days30 || '0';
+    const days120 = d120;
+    const days90 = d90;
+    const days60 = d60;
+    const days30 = d30;
     const deposit = statementData?.getStatement?.deposit || '';
-    const current = statementData?.getStatement?.current || '';
+    const current = dCurrent;
     const closingBalance = statementData?.getStatement?.closingBalance || '';
     const openingBalance = Number(closingBalance) - Number(current);
 
@@ -172,46 +191,46 @@ const accountNumber = param.accountNumber;
     
 
     const cashPaymentDate = cashPaymentData?.getCashPayment?.date || '';
-    const cashPaymentCode = '';
+    const cashPaymentCode = cashPaymentData?.getCashPayment?.code;
     const cashPaymentDescription = 'Cash Payment';
     const cashPaymentUnits = cashPaymentData?.getCashPayment?.units || '';
-    const cashPaymentTariff = '000000';
+    const cashPaymentTariff = cashPaymentData?.getCashPayment?.tariff || '';
     const cashPaymentValue = cashPaymentData?.getCashPayment?.value || '';
 
     const interestDate = interestData?.getInterest?.date || '';
-    const interestCode = '009009';
+    const interestCode = interestData?.getInterest?.code || '';
     const interestDescription = 'Interest';
     const interestUnits = interestData?.getInterest?.units || '';
-    const interestTariff = '';
+    const interestTariff = interestData?.getInterest?.tariff || '';
     const interestValue = interestData?.getInterest?.value || '';
 
     const refuseDate = refuseData?.getRefuse?.date || '';
-    const refuseCode = '050010';
+    const refuseCode = refuseData?.getRefuse?.code || '';
     const refuseDescription = 'Refuse';
     const refuseUnits = refuseData?.getRefuse?.units || '';
-    const refuseTariff = '72.430000';
+    const refuseTariff = refuseData?.getRefuse?.tariff || '';
     const refuseValue = refuseData?.getRefuse?.value || '';
 
     const sewerageDate = sewerageData?.getSewerage?.date || '';
-    const sewerageCode = '050010';
+    const sewerageCode = sewerageData?.getSewerage?.code ;
     const sewerageDescription = 'Sewerage';
     const sewerageUnits = sewerageData?.getSewerage?.units || '';
-    const sewerageTariff = '126.870000';
+    const sewerageTariff = sewerageData?.getSewerage?.tariff;
     const sewerageValue = sewerageData?.getSewerage?.value || '';
 
 
     const vatDate = vatData?.getVat?.date || '';
-    const vatCode = '008888';
+    const vatCode = vatData?.getVat?.code || '';
     const vatDescription = 'VAT';
     const vatUnits = vatData?.getVat?.units || '';
-    const vatTariff = '';
+    const vatTariff = vatData?.getVat?.tariff || '';
     const vatValue = vatData?.getVat?.value || '';
 
     const waterTariffDomesticeDate = waterTariffDomesticData?.getWaterTariffDomestic?.date || '';
-    const waterTariffDomesticCode = '041001';
+    const waterTariffDomesticCode = waterTariffDomesticData?.getWaterTariffDomestic?.code || '';
     const waterTariffDomesticDescription = 'Water';
     const waterTariffDomesticUnits = waterTariffDomesticData?.getWaterTariffDomestic?.units || '';
-    const waterTariffDomesticTariff = '12.000000';
+    const waterTariffDomesticTariff = waterTariffDomesticData?.getWaterTariffDomestic?.tariff || '';
     const waterTariffDomesticValue = waterTariffDomesticData?.getWaterTariffDomestic?.value || '';
     
     
