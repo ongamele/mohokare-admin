@@ -221,7 +221,7 @@ export function Tables() {
 
 
   const handleRedirect = (accountNumber) => {
-    const url = `http://localhost:5174/download/${accountNumber}`;
+    const url = `https://mohokare-admin.netlify.app/download/${accountNumber}`;
     window.open(url, '_blank');
   };
   return (
