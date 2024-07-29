@@ -28,18 +28,19 @@ export function SignIn() {
       navigate("/dashboard/home");
     },
     onError(err) {
-      alert("User Not Found! ");
-    },
-
-    variables: {
-      email,
-      password,
-    },
+      console.log(">>>>> error ", err);
+      alert("User Not Found!");
+    }
   });
 
-  function handleLogin(){
-    loginAdmin();
-  }
+  const handleLogin = () => {
+    loginAdmin({
+      variables: {
+        email,
+        password,
+      }
+    });
+  };
   return (
     <section className="m-8 flex gap-4">
       <div className="w-full lg:w-3/5 mt-24">

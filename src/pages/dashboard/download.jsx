@@ -19,6 +19,14 @@ import "jspdf-autotable";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import imgSrc from "../../images/municipalityLogo.jpg";
 import yeboPayLogo from "../../images/yeboPay-logo.png";
+
+import absaLogo from "../../images/banks/absa.png";
+import africanBankLogo from "../../images/banks/africanBank.png";
+import capitecLogo from "../../images/banks/capitec.png";
+import nedbankLogo from "../../images/banks/nedbank.png";
+import postOfficeLogo from "../../images/banks/postOffice.png";
+import standardBankLogo from "../../images/banks/standardBank.png";
+
 import { GET_METER_READINGS } from "../../Graphql/Queries";
 import { GET_STATEMENT } from "../../Graphql/Queries";
 import { GET_CASH_PAYMENT } from "../../Graphql/Queries";
@@ -29,6 +37,7 @@ import { GET_VAT } from "../../Graphql/Queries";
 import { GET_WATER_TARIFF_DOMESTIC } from "../../Graphql/Queries";
 
 import './styles.css'
+import { ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
 
 export function Download() {
   const param = useParams();
@@ -54,8 +63,13 @@ const {
   data: meterData,
   refetch: refetchMeterData
 } = useQuery(GET_METER_READINGS, {
-  variables: { accountNumber: removeLeadingZero(accountNumber) }
+  variables: { accountNumber: accountNumber}
 });
+
+console.log("test resdings ", JSON.stringify(meterData))
+
+
+
 
 
 
@@ -135,7 +149,7 @@ const {
 
   useEffect(() => {
     if (!statementDataLoading && statementData && !meterDataLoading && !cashPaymentDataLoading && !waterTariffDomesticDataLoading && !interestDataLoading && !refuseDataLoading && !sewerageDataLoading && !vatDataLoading && cashPaymentData) {
-    
+
       generatePDF();
     }
   }, [statementData, statementData, meterData, interestData, vatData, waterTariffDomesticData, sewerageData, refuseData, cashPaymentData]);
@@ -178,7 +192,7 @@ const {
     const deposit = statementData?.getStatement?.deposit || '';
     const current = dCurrent;
     const closingBalance = statementData?.getStatement?.closingBalance || '';
-    const openingBalance = Number(closingBalance) - Number(current);
+    const openingBalance = Number(current) - Number(closingBalance);
 
 
     
@@ -242,12 +256,40 @@ const {
     let top = 6;
     const imgWidth = 40;
     const imgHeight = 20;
+
+
+
+
+    
+    
+
+
+
   
     const doc = new jsPDF();
+
+
+
+
+
+
     var img = new Image();
     var yeboImg = new Image();
+    var absaImg = new Image();
+    var africanBankImg = new Image();
+    var capitecImg = new Image();
+    var nedbankImg = new Image();
+    var postOfficeImg = new Image();
+    var standardBankImg = new Image();
+
     img.src = imgSrc;
     yeboImg.src = yeboPayLogo;
+    absaImg.src = absaLogo
+    africanBankImg.src = africanBankLogo
+    capitecImg.src = capitecLogo
+    nedbankImg.src = nedbankLogo
+    postOfficeImg.src = postOfficeLogo
+    standardBankImg.src = standardBankLogo
     doc.addImage(img, "png", left, top, imgWidth, imgHeight);
 
         // Add a border around the entire PDF
@@ -314,6 +356,7 @@ const {
   
     const headers = ['Meter No', 'Meter Type', 'Old Reading', 'New Reading', 'Consumption','LEVIED AMOUNT'];
     const data = [[meterNumber, meterType, oldRead, newRead, consumption, leviedAmount]];
+    
   
     doc.autoTable({
       head: [headers],
@@ -414,12 +457,26 @@ doc.text('Click on the logo below to go to the banking page and settle your acco
 
 let leftYeboPay = 85;
 doc.addImage(yeboImg, "png", leftYeboPay, 222, 30, 9);
-doc.link(leftYeboPay, 222, 30, 9, { url: "https://mohokare-customer.netlify.app/" });
+doc.link(leftYeboPay, 222, 30, 9, { url: `http://localhost:5175/yebo-pay/${accountNumber}` });
 
-var linkX = leftYeboPay;
-var linkY = doc.internal.pageSize.height - 24;
-var linkWidth = 30;
-var linkHeight = 10;
+const spacing = 30 // Space between images
+const y = 250; // Y-coordinate for all images
+const width = 30; // Width for all images
+const height = 24; // Height for all images
+
+doc.addImage(absaImg, "png", 20, y, width, height);
+doc.addImage(africanBankImg, "png", 20 + spacing, y, width, height);
+doc.addImage(capitecImg, "png", 20 + 2 * spacing, y, width, 10);
+doc.addImage(nedbankImg, "png", 20 + 3 * spacing, y, width, height);
+doc.addImage(postOfficeImg, "png", 20 + 4 * spacing, y, width, height);
+doc.addImage(standardBankImg, "png", 20 + 5 * spacing, y, width, 30);
+
+doc.link(20, y, width, height, { url: 'https://www.absa.co.za/' });
+doc.link(20 + spacing, y, width, height, { url: 'https://africanbank.co.za/en/home/' });
+doc.link(20 + 2 * spacing, y, width, 10, { url: 'https://www.capitecbank.co.za/' });
+doc.link(20 + 3 * spacing, y, width, height, { url: 'https://personal.nedbank.co.za/home.html' });
+doc.link(20 + 4 * spacing, y, width, height, { url: 'https://www.postoffice.co.za/' });
+doc.link(20 + 5 * spacing, y, width, 30, { url: 'https://www.standardbank.co.za/' });
 
 
   

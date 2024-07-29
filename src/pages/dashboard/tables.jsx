@@ -409,7 +409,7 @@ export function Tables() {
           Update Details
         </Typography>
       </CardHeader>
-      <CardBody className="px-0 pt-0 pb-2">4
+      <CardBody className="px-0 pt-0 pb-2">
       
       <form className="mt-8 mb-2 mx-auto w-80 max-w-screen-lg lg:w-1/2">
           <div className="mb-1 flex flex-col gap-6">
