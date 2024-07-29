@@ -457,7 +457,7 @@ doc.text('Click on the logo below to go to the banking page and settle your acco
 
 let leftYeboPay = 85;
 doc.addImage(yeboImg, "png", leftYeboPay, 222, 30, 9);
-doc.link(leftYeboPay, 222, 30, 9, { url: `http://localhost:5175/yebo-pay/${accountNumber}` });
+doc.link(leftYeboPay, 222, 30, 9, { url: `https://mohokare-customer.netlify.app/yebo-pay/${accountNumber}` });
 
 const spacing = 30 // Space between images
 const y = 250; // Y-coordinate for all images
